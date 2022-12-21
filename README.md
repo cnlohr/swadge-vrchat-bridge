@@ -8,3 +8,8 @@
  * Add AudioLink-0.2.8
  
 Close and re-open Unity.
+
+1. Compile the swadge firmware.
+2. Point the `Makefile` In the `swadgesandbox` to point at that swadge firmware. 
+3. Type `make` in `swadgesandbox` to run the correct firmware on the swadge.
+4. Run the bridge app in `bridgeapp`
