@@ -135,11 +135,11 @@ int main()
 		{
 			int pid = bid / 4;
 			b->timeOfLaunch = (usNow - 1000*((bid&3)+1));
-			b->launchLocation[0] = sin( pid * 0.5 ) * 1280;
-			b->launchLocation[1] = pid*64;
-			b->launchLocation[2] = cos( pid * 0.5 ) * 1280;
-			b->launchRotation[0] = 0;
-			b->launchRotation[1] = pid * 100;
+			b->launchLocation[0] = sin( pid * 0.1+ frameno*.01 ) * 1280;
+			b->launchLocation[1] = pid*8+(bid&3);
+			b->launchLocation[2] = cos( pid * 0.1 + frameno*.01 ) * 1280;
+			b->launchRotation[0] = (pid*2)*15;
+			b->launchRotation[1] = (pid*.5+frameno*.5)*15;
 			b->flags = bid;
 		}
 
@@ -155,14 +155,14 @@ int main()
 			p->framesDead = 0;               //UNTRANSMITTED
 
 			p->timeOfUpdate = usNow-500;
-			p->posAt[0] = sin( pid * 0.5 ) * 1280;
-			p->posAt[1] = pid*64;
-			p->posAt[2] = cos( pid * 0.5 ) * 1280;
+			p->posAt[0] = sin( pid * 0.1 + frameno*.01 ) * 1280;
+			p->posAt[1] = pid*8;
+			p->posAt[2] = cos( pid * 0.1 + frameno*.01 ) * 1280;
 			p->velAt[0] = 0;
 			p->velAt[1] = 0;
 			p->velAt[2] = 0;
 			p->rotAt[0] = pid*2;
-			p->rotAt[1] = 0;
+			p->rotAt[1] = pid*.5+frameno*.5;
 			p->rotAt[2] = 0;
 			p->basePeerFlags = 1;
 			p->auxPeerFlags = 0;
@@ -276,17 +276,19 @@ int main()
 								{
 									// Encode timestamp of "now" in top row.
 									if( rpx & 0x1 )
-										color = 255 - ((uint8_t)(usNow >> ((rpx&0xe)*8)));
+										color = 255 - ((uint8_t)(usNow >> (((rpx&0x6)>>1)*8)));
 									else
-										color = usNow >> ((rpx&0xe)*8);
+										color = usNow >> (((rpx&0x6)>>1)*8);
 								}
 								else if( rpy == 1 )
 								{
 									// Encode sentinel in second row.
 									if( rpx & 0x1 )
-										color = 255 - ((uint8_t)(0x5AAA0fff >> ((rpx&0xe)*8)));
+										color = 255 - ((uint8_t)(0x5AAA0fff >> (((rpx&0x6)>>1)*8)));
 									else
-										color = 0x5AAA0fff >> ((rpx&0xe)*8);
+									{
+										color = 0x5AAA0fff >> (((rpx&0x6)>>1)*8);
+									}
 								}
 								else if( rpx >= 8 && rpy >= 8 )
 								{
@@ -309,7 +311,7 @@ int main()
 							}
 							else
 							{
-								int shipid = (mbx + mby * g_mbw - 3)*2+(rpy%2);
+								int shipid = (mbx + mby * g_mbw - 3)*2+(rpy/8);
 								p = &players[shipid];
 								b = &boolets[shipid*4];
 
@@ -356,7 +358,7 @@ int main()
 										color = (b+((pxid-36)/6))->launchLocation[((pxid-36)/2)%3] >> ( (pxid&1) * 8 );
 										break;
 									case 60 ... 75:
-										color = (b+((pxid-60)/4))->launchRotation[((pxid-60)/2)%3] >> ( (pxid&1) * 8 );
+										color = (b+((pxid-60)/4))->launchRotation[((pxid-60)/2)%2] >> ( (pxid&1) * 8 );
 										break;
 									case 76 ... 83:
 										color = (b+((pxid-76)/2))->flags >> ( ( pxid & 1 ) * 8);

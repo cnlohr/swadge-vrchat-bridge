@@ -13,7 +13,7 @@ public class MakeGeometry : MonoBehaviour
 		const float bananaScale = 3.0f;
 		const float shipScale = 1.0f;
 		
-		const int ships = 93;
+		const int ships = 90;
 		const int boolets = ships*4;
 		
 		Mesh banana = AssetDatabase.LoadAssetAtPath<Mesh>("Assets/SwadgeIntegration/Geometrizer/MAGFest-Banana.fbx");
