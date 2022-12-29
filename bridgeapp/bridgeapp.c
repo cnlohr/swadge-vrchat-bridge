@@ -680,8 +680,16 @@ BOOL CALLBACK EnumWindowsProc( HWND hwnd, LONG lParam )
 
 	if( rect.right - rect.left == 0 && rect.bottom - rect.top == 0 ) return TRUE;
 
-	if( rect.right > 200 && rect.right < 400 && rect.bottom > 200 && rect.bottom < 400 )
-		printf( ":%s:%s: %d %d\n", windowname, windowname, rect.right, rect.bottom );
+//	if( rect.right > 200 && rect.bottom > 200 )
+//		printf( ":%s:%s: %d %d\n", windowname, windowname, rect.right, rect.bottom );
+
+	if( mycasestr( windowexe, "VRChat" ) && rect.right > 10 && rect.bottom > 10 && 
+		strcmp( windowname, "VRChat" ) == 0 )
+	{
+		printf( "%s / %s / %d %d\n", windowname, windowexe, rect.right, rect.bottom );
+		printf( "********\n" );
+		wnd = hwnd;
+	}
 
 	if( mycasestr( windowexe, "editor\\unity" ) && rect.right > 10 && rect.bottom > 10 && 
 		mycasestr( windowname, "PC, Mac & Linux Standalone" ) )
