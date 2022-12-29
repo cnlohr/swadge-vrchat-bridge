@@ -23,6 +23,8 @@ public class H264funButton : UdonSharpBehaviour
 	private int interact_count;
     public VRCUrl _videoURL;
 
+	private double TimeSinceOk;
+
     void Start()
     {
 		if (Utilities.IsValid(unityVideo))
@@ -32,6 +34,7 @@ public class H264funButton : UdonSharpBehaviour
 			unityVideo.EnableAutomaticResync = false;
 		}
 		Interact();
+		TimeSinceOk = 0;
     }
 	
 	public override void Interact()
@@ -57,6 +60,19 @@ public class H264funButton : UdonSharpBehaviour
 		if (Utilities.IsValid(unityVideo))
 		{
 			time = unityVideo.GetTime();
+		}
+		if( unityVideo.IsPlaying )
+		{
+			TimeSinceOk = 0;
+		}
+		else
+		{
+			TimeSinceOk += Time.deltaTime;
+			if( TimeSinceOk > 8 )
+			{
+				TimeSinceOk = 0;
+				Interact();
+			}
 		}
 		textOut.text = $"Unity Video\nTime: {time}\nPlaying: {unityVideo.IsPlaying}\nCount: {interact_count}";
 		putTextureOn.GetComponent<Renderer>().material.SetTexture( "_MainTex", stealTextureFrom.GetComponent<Renderer>().material.GetTexture("_MainTex") );

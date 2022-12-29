@@ -266,7 +266,7 @@
 					uint bno = selfCoord.y - 8;
 					uint boolettol = DecodeShipData( shipno, 20+bno*4 ) + (DecodeShipData( shipno, 21+bno*4 )<<8) + (DecodeShipData( shipno, 22+bno*4 )<<16) + (DecodeShipData( shipno, 23+bno*4 )<<24);					
 					uint flags = DecodeShipData( shipno, 76+bno*2 ) + (DecodeShipData( shipno, 77+bno*2 )<<8);
-					uint genpresent = DecodeShipData( shipno, 84 );
+					uint genpresent = DecodeShipData( shipno, 84 ) > ( selfCoord.y - 8 + 1 ); // NOTE: this field is 0 for no ship to 5 for fully loaded with boolets.
 					return float4( (virtualclock-boolettol)/1000000.0, flags, genpresent, 1 );
 				}
 				case 12:
@@ -296,12 +296,15 @@
 					if( blaunch_1 & 0x8000 ) blaunch_1 |= 0xffff0000;
 					if( blaunch_2 & 0x8000 ) blaunch_2 |= 0xffff0000;
 					
-					float2 hpr2 = float2( blaunch_1, blaunch_2 ) / 11.0 / 180.0 * 3.14159;
+					float2 hpr2 = float2( blaunch_1, blaunch_2 ) / 3960 * 3.14159 * 2;
 					
 					float yawDivisor = cos( hpr2.y );
-					float3 direction = float3( sin( hpr2.x ) * yawDivisor, cos( hpr2.x ) * yawDivisor, -sin( hpr2.y ) );
+					float3 direction = float3( sin( hpr2.x ) * yawDivisor,  -sin( hpr2.y ), cos( hpr2.x ) * yawDivisor );
 
 					return float4( direction, 1.0 );
+					
+
+
 				}
 				default:
 					return 0.0;

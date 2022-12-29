@@ -529,7 +529,7 @@ const char * OrigCode = "0057b48600000000f691af67102d5101eaa3bd072f1b0b5d496faa0
 		rtmpp_add_property( cmd_buffer, &cmd_place, sizeof( cmd_buffer ), "videodatarate" );
 		rtmpp_add_number( cmd_buffer, &cmd_place, sizeof( cmd_buffer ), 2000 );
 		rtmpp_add_property( cmd_buffer, &cmd_place, sizeof( cmd_buffer ), "framerate" );
-		rtmpp_add_number( cmd_buffer, &cmd_place, sizeof( cmd_buffer ), 30 );
+		rtmpp_add_number( cmd_buffer, &cmd_place, sizeof( cmd_buffer ), 10 );
 
 #if 0
 		rtmpp_add_property( cmd_buffer, &cmd_place, sizeof( cmd_buffer ), "audiocodecid" );

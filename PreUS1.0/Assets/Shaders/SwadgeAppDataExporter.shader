@@ -39,7 +39,7 @@
 			ENDCG
 		}
 		
-		Tags { "RenderType"="Overlay+1" }
+		Tags { "RenderType"="Opaque" "Queue"="Overlay" }
 		Cull Off
 		ZTest Always
 
@@ -75,6 +75,17 @@
 					return false;
 				#endif
 			}
+
+			float3 GunLocations[24];
+			float3 GunVelocities[24];
+			float4 GunRotations[24];
+			float GunAssociatedPlayerID[24]; // Set to -1 for not being held.  Otherwise, use playerID from my player interface (TODO)
+			int NumGuns; //MUST be gun 0...NumGuns
+			
+			float3 BooletStartLocation[240];
+			float3 BooletStartDirection[240];
+			float3 BooletStartDataTime[240]; // [in_use 0 or 1, a counter making a unique value starting at 0 and counting to 65535 and resetting to zero.]
+			int NumBoolets;
 
 			float3 SkeletonData[12*84];
 			float3 GenProps;
@@ -164,7 +175,7 @@
 						//Each line: <boolet> <boolet>
 						
 						//BOOLETS ARE CURRENTLY UNUSED.
-						testvar = 2.2;
+						testvar = 0;//2.2;
 					}
 					else if( sp.y < 584 ) // 84*4+248
 					{
@@ -180,7 +191,7 @@
 					{
 						// Guns are
 						//    <coord base> <dir xyz> <trigger amount, reserved.yz>
-						testvar = 0.1;						
+						testvar = 0;//0.1;						
 					}
 					else
 					{

@@ -107,7 +107,7 @@ int main()
 
 	H264Funzie funzie;
 	{
-		const H264ConfigParam params[] = { /*{H2FUN_CNT_TYPE, 2}, */{ H2FUN_TIME_ENABLE, 0 },  { H2FUN_TIME_NUMERATOR, 1000 }, { H2FUN_TIME_DENOMINATOR, 30000 }, { H2FUN_TERMINATOR, 0 } };
+		const H264ConfigParam params[] = { /*{H2FUN_CNT_TYPE, 2}, */{ H2FUN_TIME_ENABLE, 0 },  { H2FUN_TIME_NUMERATOR, 1000 }, { H2FUN_TIME_DENOMINATOR, 10000 }, { H2FUN_TERMINATOR, 0 } };
 		r = H264FunInit( &funzie, w, h , 1, (H264FunData)RTMPSend, &rtmp, params );
 		if( r )
 		{
@@ -134,7 +134,7 @@ int main()
 		for( ; b != bend; b++, bid++ )
 		{
 			int pid = bid / 4;
-			b->timeOfLaunch = (usNow - 1000*((bid&3)+1));
+			b->timeOfLaunch = (usNow + 1000000*((bid&3)));
 			b->launchLocation[0] = sin( pid * 0.1+ frameno*.01 ) * 1280;
 			b->launchLocation[1] = pid*8+(bid&3);
 			b->launchLocation[2] = cos( pid * 0.1 + frameno*.01 ) * 1280;

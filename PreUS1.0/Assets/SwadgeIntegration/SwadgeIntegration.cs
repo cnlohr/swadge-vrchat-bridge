@@ -43,7 +43,6 @@ public class SwadgeIntegration : UdonSharpBehaviour
 				BoneData[place++] = p.GetBonePosition(HumanBodyBones.LeftHand);
 				BoneData[place++] = p.GetBonePosition(HumanBodyBones.RightHand);
 				BoneData[place++] = p.GetVelocity();
-                break;
             }
 		}
 
@@ -61,6 +60,7 @@ public class SwadgeIntegration : UdonSharpBehaviour
 			if( !Utilities.IsValid( playerArray[i] ) )
 			{
 				playerArray[i] = player;
+				break;
 			}
 		}
     }
@@ -72,6 +72,12 @@ public class SwadgeIntegration : UdonSharpBehaviour
 			if( player == playerArray[i] )
 			{
 				playerArray[i] = null;
+				int place = i*12;
+				int ct = 0;
+				for( ct = 0; ct < 12; ct++ )
+				{
+					BoneData[place++] = new Vector4( 0.0f, 0.0f, 0.0f, 0.0f );
+				}
 				break;
 			}
 		}

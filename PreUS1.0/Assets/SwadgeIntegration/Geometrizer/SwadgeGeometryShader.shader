@@ -108,10 +108,10 @@
 					float3 hpra = _GeometryTex[uint2( columnInGeoTex, 3 )];
 
 					// from tdRotateNoMulEA on the swadge.
-					float cx = cos( hpra[0] );
-					float sx = sin( hpra[0] );
-					float cy = cos( hpra[1] );
-					float sy = sin( hpra[1] );
+					float cy = cos( hpra[0] ); // NOTICE: FLIPPED CX/CY
+					float sy = sin( hpra[0] );
+					float cx = cos( hpra[1] );
+					float sx = sin( hpra[1] );
 					float cz = cos( hpra[2] );
 					float sz = sin( hpra[2] );
 
@@ -120,28 +120,23 @@
 						cy*sz, sx*sy*sz+cx*cz, cx*sy*sz-sx*cz,
 						-sy, sx*cy, cx*cy );
 					
+					objectPlace.xyz = objectPlace.xzy * float3( 1, 1, -1 );
 					objectPlace.xyz = mul( rmot, objectPlace.xyz );
 				}
 				else
 				{
 					// BANANA
+					float3 RotationAxis = normalize( chash33( float3( groupNo, bananaNo, .373) ) );
+					float RotationAngle = _GeometryTex[uint2( columnInGeoTex, 8+bananaNo)].x*10;
+					float4 q = float4( RotationAxis.x * sin( RotationAngle / 2 ),
+									  RotationAxis.y * sin( RotationAngle / 2 ),
+									  RotationAxis.z * sin( RotationAngle / 2 ),
+									  cos(RotationAngle / 2) );
 
-					float3 hpra = _GeometryTex[uint2( columnInGeoTex, 3 )];
+					objectPlace.xyz = objectPlace.xyz + 2.0 * cross(q.xyz, cross(q.xyz, objectPlace.xyz) + q.w *objectPlace.xyz);
 
-					// from tdRotateNoMulEA on the swadge.
-					float cx = cos( hpra[0] );
-					float sx = sin( hpra[0] );
-					float cy = cos( hpra[1] );
-					float sy = sin( hpra[1] );
-					float cz = cos( hpra[2] );
-					float sz = sin( hpra[2] );
-
-					float3x3 rmot = float3x3(
-						cy*cz, sx*sy*cz-cx*sz, cx*sy*cz+sx*sz,
-						cy*sz, sx*sy*sz+cx*cz, cx*sy*sz-sx*cz,
-						-sy, sx*cy, cx*cy );
-					
-					objectPlace.xyz = mul( rmot, objectPlace.xyz );
+					// If id == 0 it is a non-banana.
+					if( _GeometryTex[uint2( columnInGeoTex, 8+bananaNo)].z < 0.1 ||  _GeometryTex[uint2( columnInGeoTex, 8+bananaNo)].x < 0 ) return;
 				}
 				
 				float4 worldPlace = mul(unity_ObjectToWorld, objectPlace );
@@ -150,12 +145,14 @@
 				{
 					worldPlace.xyz += _GeometryTex[uint2( columnInGeoTex, 1)] +
 									  _GeometryTex[uint2( columnInGeoTex, 2)] * _GeometryTex[uint2( columnInGeoTex, 0)].x;
+									  
+  					if( length( o.debug ) == 0 ) o.debug.r = -2;
 				}
 				else
 				{
 					worldPlace.xyz += _GeometryTex[uint2( columnInGeoTex, 12+bananaNo)] +
 									  _GeometryTex[uint2( columnInGeoTex, 16+bananaNo)] * _GeometryTex[uint2( columnInGeoTex, 8+bananaNo)].x * 7.629;
-
+									  
 					// Is banana.
 					o.debug.r = -1;
 				}
@@ -186,7 +183,11 @@
 			{
 				// sample the texture
 				float4 col = length(i.debug)?i.debug:float4( i.normal, 1.0 );
-				if( i.debug.r < 0 )
+				if( i.debug.r < -1 )
+				{
+					col = tex2D( _ShipTex, float3( i.uv.xy, 0.0 ) );
+				}
+				else if( i.debug.r < 0 )
 				{
 					col = tex2D( _BananaTex, float3( i.uv.xy, 0.0 ) );
 				}

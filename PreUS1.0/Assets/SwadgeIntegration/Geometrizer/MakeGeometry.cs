@@ -17,7 +17,7 @@ public class MakeGeometry : MonoBehaviour
 		const int boolets = ships*4;
 		
 		Mesh banana = AssetDatabase.LoadAssetAtPath<Mesh>("Assets/SwadgeIntegration/Geometrizer/MAGFest-Banana.fbx");
- 		Mesh ship   = AssetDatabase.LoadAssetAtPath<Mesh>("Assets/SwadgeIntegration/Geometrizer/Ship-13Vert33Edge.fbx");
+ 		Mesh ship   = AssetDatabase.LoadAssetAtPath<Mesh>("Assets/SwadgeIntegration/Geometrizer/SwadgeWing.fbx");
 
 		int[] bananaIndices = banana.GetIndices( 0, true ); 
 		int[] shipIndices = banana.GetIndices( 0, true ); 
