@@ -38,7 +38,11 @@
 			int2 mbxy = uint2( macroblock % 8, macroblock / 8 ) * 16;  // resolution-dependent.
 			uint dpfield = ( uint(field * 3) + 1) / 2;
 			int2 fieldxy = uint2( dpfield % 16, dpfield / 16 + (ship % 2) * 8 );
-			return _MainTex[fieldxy+mbxy].x*255.4;
+
+			// TRICKY: NVIDIA users have nice 0..255.
+			// BUT AMD USERSSSSS...
+			float3 val = _MainTex[fieldxy+mbxy];
+			return dot( val, 1. )*85.2;
 			// 0 1 2 3 4 5 6
 			// 0 2 3 5 6 8 9 
 		}

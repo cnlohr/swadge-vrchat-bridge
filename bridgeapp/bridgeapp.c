@@ -133,7 +133,7 @@ void SendPacketToSwadge()
 	static int send_no;
 	send_no++;
 	
-	for( i = 0; i < 15; i++ )
+	for( i = 0; i < 84; i++ )
 	{
 //og_mutex_t mutSendDataBank;
 //float BonePositions[84][12][3];
@@ -196,8 +196,7 @@ void SendPacketToSwadge()
 				codeword |= 1 << (sbl++); // Go to right foot.
 				*/
 				// Above generates the following:
-				//codeword |= 0b1110011001011011<<sbl; sbl+=16;
-				codeword |= 0b1100110011100111<<sbl; sbl+=16;
+				codeword |= 0b1011001100110111<<sbl; sbl+=16;
 					//0b1100110011100111<<sbl; sbl+=16;  //WORKS, right leg
 			}
 			else
@@ -243,20 +242,37 @@ void SendPacketToSwadge()
 
 			if( hasSkeleton )
 			{
-				const int boneAssignments[12] = { -2, 7, 9, -2, 8, 10, -2, 1, -3, 5, -4, 6 };
-				for( j = 0; j < nrbones; j++ )
+				const int boneAssignments[14] = { 2, 7, 9, 2, 8, 10, -999, 3, 5, -999, 4, 6, 2, 1 };
+				for( j = 0; j < sizeof(boneAssignments)/sizeof(boneAssignments[0]); j++ )
 				{
 					int emitBone = boneAssignments[j];
+					int16_t newp[3];
 					if( emitBone < 0 )
 					{
 						emitBone *= -1;
-						memcpy( cursor, loc, sizeof( cursor ) );
+						if( emitBone == 999 )
+						{
+							memcpy( cursor, loc, sizeof( cursor ) );
+							continue;							
+						}
+						else
+						{
+							newp[0] = -BonePositions[LastSendPlayerPos][emitBone][0] * 64; // XXX UNIVERSE FLIP
+							newp[1] = BonePositions[LastSendPlayerPos][emitBone][1] * 64;
+							newp[2] = BonePositions[LastSendPlayerPos][emitBone][2] * 64;
+
+							newp[0] = newp[0];
+							newp[1] = newp[1];
+							newp[2] = newp[2];
+						}
 					}
-					
-					int16_t newp[3];
-					newp[0] = -BonePositions[LastSendPlayerPos][emitBone][0] * 64; // XXX UNIVERSE FLIP
-					newp[1] = BonePositions[LastSendPlayerPos][emitBone][1] * 64;
-					newp[2] = BonePositions[LastSendPlayerPos][emitBone][2] * 64;
+					else
+					{
+						newp[0] = -BonePositions[LastSendPlayerPos][emitBone][0] * 64; // XXX UNIVERSE FLIP
+						newp[1] = BonePositions[LastSendPlayerPos][emitBone][1] * 64;
+						newp[2] = BonePositions[LastSendPlayerPos][emitBone][2] * 64;
+					}
+
 					((int8_t*)pack)[0] = newp[0] - cursor[0];
 					((int8_t*)pack)[1] = newp[1] - cursor[1];
 					((int8_t*)pack)[2] = newp[2] - cursor[2];
@@ -264,9 +280,9 @@ void SendPacketToSwadge()
 					if( emitBone == 1 )
 					{
 						//TRICKY: Make heads look bigger.  Otherwise it looks jankey.
-						((int8_t*)pack)[0] *=2;
-						((int8_t*)pack)[1] *=2;
-						((int8_t*)pack)[2] *=2;
+						((int8_t*)pack)[0] *= 3;
+						((int8_t*)pack)[1] *= 3;
+						((int8_t*)pack)[2] *= 3;
 					}
 					cursor[0] = newp[0];
 					cursor[1] = newp[1];
@@ -288,7 +304,9 @@ void SendPacketToSwadge()
 		if( sendmod == 3 ) break; // Set max # of players/models to send per frame.
 	}
 
-	for( i = 0; i < 0; i++ )
+#if 0
+	// DEMO SHIPS
+	for( i = 0; i < 3; i++ )
 	{
 		sendshp++;
 		
@@ -313,10 +331,20 @@ void SendPacketToSwadge()
 		memcpy( pack, &flags, sizeof( flags ) ); pack += sizeof( flags );
 		memcpy( pack, &kbb, sizeof( kbb ) ); pack += sizeof( kbb );
 		*(pack++) = (i+send_no+iter*10)%216; // req color
-
 	}
-	// Now, need to send boolets.
+	#endif
+	
+	// REAL SHIPS.
 	for( i = 0; i < 0; i++ )
+	{
+		//sendshp++;
+		
+		// TODO.
+	}
+
+
+	// Now, need to send boolets.
+	for( i = 0; i < 5; i++ )
 	{
 		sendboo++;
 		
@@ -338,6 +366,7 @@ void SendPacketToSwadge()
 	}
 
 	OGUnlockMutex( mutSendDataBank );
+	printf( "PL: %d\n", pack - buff );
 
 	
 	uint32_t assetCounts = 0;

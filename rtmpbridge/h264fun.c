@@ -244,7 +244,8 @@ int H264FUNPREFIX H264FunInit( H264Funzie * fun, int w, int h, int slices, H264F
 
 	// A completely dark frame.
 	memset( H2mb_dark, 128, 256 );
-	memset( H2mb_dark+256, 128, 128 );
+	memset( H2mb_dark + 256, 128, 64 );
+	memset( H2mb_dark + 320, 128, 64 );
 	
 	if( ( w & 0xf ) || ( h & 0xf ) ) return -1;
 	fun->bytesofar = 0;
