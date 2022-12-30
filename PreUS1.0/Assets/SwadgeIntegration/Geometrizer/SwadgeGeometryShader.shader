@@ -144,7 +144,7 @@
 				if( isShip )
 				{
 					worldPlace.xyz += _GeometryTex[uint2( columnInGeoTex, 1)] +
-									  _GeometryTex[uint2( columnInGeoTex, 2)] * _GeometryTex[uint2( columnInGeoTex, 0)].x;
+									  _GeometryTex[uint2( columnInGeoTex, 2)] * -_GeometryTex[uint2( columnInGeoTex, 0)].x;
 									  
   					if( length( o.debug ) == 0 ) o.debug.r = -2;
 				}

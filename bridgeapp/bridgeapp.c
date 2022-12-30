@@ -184,6 +184,7 @@ void SendPacketToSwadge()
 				codeword |= 0 << (sbl++);  // ---> Go back to Neck
 				codeword |= 1 << (sbl++); // To Right-Forearm
 				codeword |= 1 << (sbl++); // To Right-Hand
+				//?? Extra 1?
 				codeword |= 0 << (sbl++);  // 0 is yes, reset back to zero.
 				codeword |= 0 << (sbl++);  // ---> Go back to Neck
 				codeword |= 1 << (sbl++); // To Head
@@ -195,7 +196,9 @@ void SendPacketToSwadge()
 				codeword |= 1 << (sbl++); // Go to right foot.
 				*/
 				// Above generates the following:
-				codeword |= 0b1110011001011011<<sbl; sbl+=16;
+				//codeword |= 0b1110011001011011<<sbl; sbl+=16;
+				codeword |= 0b1100110011100111<<sbl; sbl+=16;
+					//0b1100110011100111<<sbl; sbl+=16;  //WORKS, right leg
 			}
 			else
 			{
@@ -203,18 +206,34 @@ void SendPacketToSwadge()
 				codeword |= 1 << (sbl++);
 			}
 			
+			
+			/*
+				BoneData[place++] = p.GetPosition();                                    0
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.Head);             1
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.Neck);             2
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.LeftLowerLeg);     3
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.RightLowerLeg);    4
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.LeftFoot);         5
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.RightFoot);        6
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.LeftLowerArm);     7
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.RightLowerArm);    8
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.LeftHand);         9
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.RightHand);       10
+				BoneData[place++] = p.GetVelocity();
+			*/
+			
 			*((uint32_t*)pack) = codeword; pack += 4;
 
 			int16_t loc[3];
 			int ang = ((now >> 19)+i*30) % 360;
-			loc[0] = BonePositions[LastSendPlayerPos][0][0] * 64;
+			loc[0] = -BonePositions[LastSendPlayerPos][0][0] * 64; // XXX UNIVERSE FLIP
 			loc[1] = BonePositions[LastSendPlayerPos][0][1] * 64;
 			loc[2] = BonePositions[LastSendPlayerPos][0][2] * 64;
 			memcpy( pack, loc, sizeof( loc ) ); pack += sizeof( loc );
 			*(pack++) = 255; // radius
 			*(pack++) = 35; // req color
 			int8_t vel[3];
-			vel[0] = BonePositions[LastSendPlayerPos][11][0] * 4;
+			vel[0] = -BonePositions[LastSendPlayerPos][11][0] * 4; // XXX UNIVERSE FLIP
 			vel[1] = BonePositions[LastSendPlayerPos][11][1] * 4;
 			vel[2] = BonePositions[LastSendPlayerPos][11][2] * 4;
 			memcpy( pack, vel, sizeof( vel ) ); pack += sizeof( vel );
@@ -235,12 +254,20 @@ void SendPacketToSwadge()
 					}
 					
 					int16_t newp[3];
-					newp[0] = BonePositions[LastSendPlayerPos][emitBone][0] * 64;
+					newp[0] = -BonePositions[LastSendPlayerPos][emitBone][0] * 64; // XXX UNIVERSE FLIP
 					newp[1] = BonePositions[LastSendPlayerPos][emitBone][1] * 64;
 					newp[2] = BonePositions[LastSendPlayerPos][emitBone][2] * 64;
 					((int8_t*)pack)[0] = newp[0] - cursor[0];
 					((int8_t*)pack)[1] = newp[1] - cursor[1];
 					((int8_t*)pack)[2] = newp[2] - cursor[2];
+					
+					if( emitBone == 1 )
+					{
+						//TRICKY: Make heads look bigger.  Otherwise it looks jankey.
+						((int8_t*)pack)[0] *=2;
+						((int8_t*)pack)[1] *=2;
+						((int8_t*)pack)[2] *=2;
+					}
 					cursor[0] = newp[0];
 					cursor[1] = newp[1];
 					cursor[2] = newp[2];

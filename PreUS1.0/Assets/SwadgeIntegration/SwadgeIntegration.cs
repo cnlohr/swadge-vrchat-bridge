@@ -31,7 +31,8 @@ public class SwadgeIntegration : UdonSharpBehaviour
             if( Utilities.IsValid( p ) )
             {
 				int place = i*12;
-				BoneData[place++] = p.GetPosition();
+				Vector3 v = p.GetBonePosition(HumanBodyBones.Hips);
+				BoneData[place++] = (v.magnitude==0)?p.GetPosition():v;
 				BoneData[place++] = p.GetBonePosition(HumanBodyBones.Head);
 				BoneData[place++] = p.GetBonePosition(HumanBodyBones.Neck);
 				BoneData[place++] = p.GetBonePosition(HumanBodyBones.LeftLowerLeg);
