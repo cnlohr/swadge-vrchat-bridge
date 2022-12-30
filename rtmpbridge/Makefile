@@ -1,18 +1,18 @@
 
 ifeq ($(shell uname), Linux)
-CFLAGS:=-g -Os
+CFLAGS:=-g -O2
 LDFLAGS:=-lm -lpthread
-TARGET:=rtmpswadgetest_dummy
+TARGET:=rtmpbridge
 else
-CFLAGS:=-g -Os
+CFLAGS:=-g -O2
 LDFLAGS:=-lm -luser32 -lws2_32
-TARGET:=rtmpswadgetest_dummy.exe
+TARGET:=rtmpbridge.exe
 endif
 
 all : $(TARGET)
 
    
-$(TARGET) : rtmpswadgetest_dummy.c
+$(TARGET) : rtmpbridge.c
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean :

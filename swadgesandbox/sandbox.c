@@ -22,7 +22,7 @@
 #define FSNET_CODE_SERVER 0x73534653
 #define FSNET_CODE_PEER 0x66534653
 
-
+int espNowIsInit = 0;
 int global_i = 100;
 meleeMenu_t * menu;
 font_t meleeMenuFont;
@@ -81,7 +81,6 @@ void sandboxRxESPNow(const uint8_t* mac_addr, const char* data, uint8_t len, int
 uint32_t stime;
 void sandboxTxESPNow(const uint8_t* mac_addr, esp_now_send_status_t status)
 {
-
 	//uint32_t end = esp_timer_get_time();
 	//uprintf( "ESP-NOW>%d %d\n", status, end-stime );
 }
@@ -96,6 +95,7 @@ int dummy( uint32_t a, uint32_t b )
 
 void sandbox_main(display_t * disp_in)
 {
+	espNowIsInit = 0;
 	menu = 0; disp = disp_in;
 
 	uprintf( "Running from IRAM. %d\n", global_i );
@@ -113,10 +113,12 @@ void sandbox_main(display_t * disp_in)
 
 
 	uprintf( "Loaded\n" );
+	espNowIsInit = 1;
 }
 
 void sandbox_exit()
 {
+	espNowIsInit = 0;
 	uprintf( "Exit\n" );
 	if( menu )
 	{
@@ -249,7 +251,7 @@ void sandbox_tick()
 			loc[0] = getSin1024( ang )>>3;
 			loc[1] = 500;
 			loc[2] = getCos1024( ang )>>3;
-[
+
 		    *(pack++) = i+send_no; // Local "bulletID"
 		    memcpy( pack, &now, sizeof(now) ); pack += sizeof( now );
 		    memcpy( pack, loc, sizeof(loc) ); pack += sizeof( loc );
@@ -285,7 +287,10 @@ int16_t sandboxAdvancedUSB(uint8_t * buffer, uint16_t length, uint8_t isGet )
 	}
 	else
 	{
-		espNowSend((char*)(buffer+2), buffer[1]); //Don't enable yet.
+		if( espNowIsInit )
+		{
+			espNowSend((char*)(buffer+2), buffer[1]);
+		}
 		return length;
 	}
 }

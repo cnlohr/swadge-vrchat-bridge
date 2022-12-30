@@ -28,6 +28,8 @@
 
 #include "os_generic.h"
 
+#define INTERNAL_RTMP_RAW_DATA_PORT 39937
+
 #define w 128
 #define h 96
 const int g_mbw = w / 16;
@@ -116,9 +118,29 @@ int main()
 		}
 	}
 
+	int udphostsock = socket(AF_INET, SOCK_DGRAM, 0);
+	{
+		struct sockaddr_in servaddr = { 0 };
+		// Filling server information
+		servaddr.sin_family    = AF_INET; // IPv4
+		servaddr.sin_addr.s_addr = INADDR_ANY;
+		servaddr.sin_port = htons( INTERNAL_RTMP_RAW_DATA_PORT );
+
+		if( bind(udphostsock, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0 )
+		{
+			fprintf( stderr, "bind for sockhost failed\n" );
+			exit(EXIT_FAILURE);
+		}
+	}
+	
 	usleep(500000);
 	int frameno = 0;
 	int cursor = 0;
+	
+	
+	int doread_timeout_ms = 40;
+	int demo_mode = 40;
+	
 	while( 1 )
 	{
 		int bk;
@@ -126,58 +148,103 @@ int main()
 		
 		double dNow = OGGetAbsoluteTime();
 		uint32_t usNow = (uint32_t)(dNow * 1000000.0);
-
-		boolet_t boolets[(g_mbw*g_mbh-3)*8];
-		boolet_t * b = boolets;
-		boolet_t * bend = b + (g_mbw*g_mbh-3)*8;
-		int bid = 0;
-		for( ; b != bend; b++, bid++ )
-		{
-			int pid = bid / 4;
-			b->timeOfLaunch = (usNow + 1000000*((bid&3)));
-			b->launchLocation[0] = sin( pid * 0.1+ frameno*.01 ) * 1280;
-			b->launchLocation[1] = pid*8+(bid&3);
-			b->launchLocation[2] = cos( pid * 0.1 + frameno*.01 ) * 1280;
-			b->launchRotation[0] = (pid*2)*15;
-			b->launchRotation[1] = (pid*.5+frameno*.5)*15;
-			b->flags = bid;
-		}
-
 		
-		multiplayerpeer_t players[(g_mbw*g_mbh-3)*2];
-		multiplayerpeer_t * p = players;
-		multiplayerpeer_t * pend = p + (g_mbw*g_mbh-3)*2;
-		int pid = 0;
-		for( ; p != pend; p++, pid++ )
-		{
-			p->timeOffsetOfPeerFromNow = 0; // UNTRANSMITTED
-			memset( p->mac, 0, sizeof( p->mac ) ); // UNTRANSMITTED
-			p->framesDead = 0;               //UNTRANSMITTED
+		static uint8_t netbuff[128*128];
 
-			p->timeOfUpdate = usNow-500;
-			p->posAt[0] = sin( pid * 0.1 + frameno*.01 ) * 1280;
-			p->posAt[1] = pid*8;
-			p->posAt[2] = cos( pid * 0.1 + frameno*.01 ) * 1280;
-			p->velAt[0] = 0;
-			p->velAt[1] = 0;
-			p->velAt[2] = 0;
-			p->rotAt[0] = pid*2;
-			p->rotAt[1] = pid*.5+frameno*.5;
-			p->rotAt[2] = 0;
-			p->basePeerFlags = 1;
-			p->auxPeerFlags = 0;
-			p->reqColor = pid; // Bright white.
-		}
-	
-/*
-		if( ( frameno % 200 ) == 1 )
+
+#if defined(WINDOWS) || defined(WIN32) || defined( _WIN32 ) || defined( WIN64 )
+		DWORD read_timeout = doread_timeout_ms;
+#else
+		struct timeval read_timeout;
+		read_timeout.tv_sec = 0;
+		read_timeout.tv_usec = doread_timeout_ms*1000;
+#endif
+		int r = setsockopt(udphostsock, SOL_SOCKET, SO_RCVTIMEO, (char*)&read_timeout, sizeof read_timeout);
+		if( r ) printf( "UDP Interceptor sockopt: %d\n", r );
+
+		r = recv(udphostsock, (char *)netbuff, sizeof(netbuff), 0 );
+		
+		if( r < 128*96 )
 		{
-			H264FakeIFrame( &funzie );
-			//H264FunEmitIFrame( &funzie );
+			// Runt packet or failure, ignore.
+			demo_mode = 1;
+			doread_timeout_ms = 40;
 		}
-		else */
+		else
 		{
+			doread_timeout_ms = 1000;
+			demo_mode = 0;
+		}
+		
+		
+		
+		if( !demo_mode )
+		{
+			int x, y;
+			for( y = 0; y < g_mbh; y++ )
+			for( x = 0; x < g_mbw; x++ )
+			{
+				uint8_t * fbuf = malloc(16*16);
+				int ix, iy;
+				for( iy = 0; iy < 16; iy++ )
+				{
+					uint32_t * src = (uint32_t*)(netbuff + (x * 16 + (y * 16 + iy) * w ));
+					uint32_t * dst = (uint32_t*)(fbuf + iy * 16 );
+					for( ix = 0; ix < 4; ix++ )
+					{
+						dst[ix] = src[ix];
+					}
+				}
+				H264FunAddMB( &funzie, x, y, fbuf, H264FUN_PAYLOAD_LUMA_ONLY );
+			}
+			H264FunEmitIFrame( &funzie );			
+			printf( "Ferry frame %d %d %d\n", r, g_mbw, g_mbh );
+		}
+		else
+		{
+			// THIS CODE IS GENERALLY NOT USED EXCEPT WHEN THERE IS A FAILURE AND THINGS GO INTO DEMO MODE.
+			boolet_t boolets[(g_mbw*g_mbh-3)*8];
+			boolet_t * b = boolets;
+			boolet_t * bend = b + (g_mbw*g_mbh-3)*8;
+			int bid = 0;
+			for( ; b != bend; b++, bid++ )
+			{
+				int pid = bid / 4;
+				b->timeOfLaunch = (usNow + 1000000*((bid&3)));
+				b->launchLocation[0] = sin( pid * 0.1+ frameno*.01 ) * 1280;
+				b->launchLocation[1] = pid*8+(bid&3);
+				b->launchLocation[2] = cos( pid * 0.1 + frameno*.01 ) * 1280;
+				b->launchRotation[0] = (pid*2)*15;
+				b->launchRotation[1] = (pid*.5+frameno*.5)*15;
+				b->flags = bid;
+			}
+
 			
+			multiplayerpeer_t players[(g_mbw*g_mbh-3)*2];
+			multiplayerpeer_t * p = players;
+			multiplayerpeer_t * pend = p + (g_mbw*g_mbh-3)*2;
+			int pid = 0;
+			for( ; p != pend; p++, pid++ )
+			{
+				p->timeOffsetOfPeerFromNow = 0; // UNTRANSMITTED
+				memset( p->mac, 0, sizeof( p->mac ) ); // UNTRANSMITTED
+				p->framesDead = 0;               //UNTRANSMITTED
+
+				p->timeOfUpdate = usNow-500;
+				p->posAt[0] = sin( pid * 0.1 + frameno*.01 ) * 1280;
+				p->posAt[1] = pid*8;
+				p->posAt[2] = cos( pid * 0.1 + frameno*.01 ) * 1280;
+				p->velAt[0] = 0;
+				p->velAt[1] = 0;
+				p->velAt[2] = 0;
+				p->rotAt[0] = pid*2;
+				p->rotAt[1] = pid*.5+frameno*.5;
+				p->rotAt[2] = 0;
+				p->basePeerFlags = 1;
+				p->auxPeerFlags = 0;
+				p->reqColor = pid; // Bright white.
+			}
+
 			for( bk = 0; bk < g_mbw*g_mbh; bk++ )
 			{
 				int mbx = 0;
@@ -389,22 +456,27 @@ int main()
 
 				H264FunAddMB( &funzie, mbx,  mby, buffer, H264FUN_PAYLOAD_LUMA_ONLY );
 			}
+			
+				
 			//H264FunEmitFrame( &funzie );
 			H264FunEmitIFrame( &funzie );
 			if( frameno == 1 )
 			{
 				stbi_write_png( "../PreUS1.0/Assets/SwadgeIntegration/dummy_payload.png", w, h, 1, dumpbuffer, w);
 			}
+
+			//OGUSleep( 16000 );
+			static double dly;
+			double now = OGGetAbsoluteTime();
+			if( dly == 0 ) dly = now;
+			while( dly > now )
+			{
+				now = OGGetAbsoluteTime();
+			}
+			dly += 0.05;
+			printf( "Demo frame (no provider)\n" );
 		}
-		//OGUSleep( 16000 );
-		static double dly;
-		double now = OGGetAbsoluteTime();
-		if( dly == 0 ) dly = now;
-		while( dly > now )
-		{
-			now = OGGetAbsoluteTime();
-		}
-		dly += 0.05;
+
 	}
 
 	return 0;

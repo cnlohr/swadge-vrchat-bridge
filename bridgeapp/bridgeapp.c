@@ -24,9 +24,55 @@
 #include "packagingfunctions.h"
 
 
+int demomode = 1;
 swadge_t * swadge;
 
+typedef struct  // 32 bytes.
+{
+    uint32_t timeOffsetOfPeerFromNow;
+    uint32_t timeOfUpdate;  // In our timestamp
+    uint8_t  mac[6];
 
+    // Not valid for server.
+    int16_t posAt[3];
+    int8_t  velAt[3];
+    int8_t  rotAt[3];    // Right now, only HPR where R = 0
+    uint8_t  basePeerFlags; // If zero, don't render.  Note flags&1 has reserved meaning locally for presence..  if flags & 2, render as dead.
+    uint16_t  auxPeerFlags; // If dead, is ID of boolet which killed "me"
+    uint8_t  framesDead;
+    uint8_t  reqColor;
+} multiplayerpeer_t;
+
+typedef struct  // Rounds up to 16 bytes.
+{
+    uint32_t timeOfLaunch; // In our timestamp.
+    int16_t launchLocation[3];
+    int16_t launchRotation[2]; // Pitch and Yaw
+    uint16_t flags;  // If 0, disabled.  Otherwise, is a randomized ID.
+} boolet_t;
+
+typedef struct
+{
+    uint32_t timeOfUpdate;
+    uint32_t binencprop;      //Encoding starts at lsb.  First: # of bones, then the way the bones are interconnected.
+    int16_t root[3];
+    uint8_t  radius;
+    uint8_t  reqColor;
+    int8_t  velocity[3];
+    int8_t  bones[0*3];  //Does not need to be all that long.
+
+} network_model_t;
+
+og_mutex_t HidMutex;
+
+#define MAX_RTMP_PLAYERS 90
+multiplayerpeer_t gOplayers[(MAX_RTMP_PLAYERS)];
+boolet_t gOboolets[(MAX_RTMP_PLAYERS)*4];
+og_mutex_t rtmpOutLock;
+void * RTMPTransmitThread( void * v );
+void * SwadgeReceiver( void * v );
+
+#include "bridgeapp_rtmp.c"
 
 HWND wnd = 0;
 HDC screen;
@@ -51,6 +97,7 @@ BOOL CALLBACK EnumWindowsProc( HWND hwnd, LONG lParam );
 og_mutex_t mutSendDataBank;
 float BonePositions[MAX_VRC_PLAYERS][12][3];
 int   LastSendPlayerPos;
+
 
 int IsVec3Zero( float * vec )
 {
@@ -292,7 +339,6 @@ void SendPacketToSwadge()
 	}
 }
 
-og_mutex_t HidMutex;
 
 void * SwadgeSender( void * v )
 {
@@ -302,38 +348,6 @@ void * SwadgeSender( void * v )
 		if( swadge )
 			SendPacketToSwadge();
 		OGUnlockMutex( HidMutex );
-		Sleep(1);
-	}
-}
-
-void * SwadgeReceiver( void * v )
-{
-	while( 1 )
-	{
-		uint8_t data[257];
-		do
-		{
-			data[0] = 173;
-			int r;
-			if( swadge )
-				r = hid_get_feature_report( swadge, data, 257 );
-			else
-				r = -9;
-
-			if( r < 0 ) {
-				printf( "00Setu %d %d\n", r, HidMutex );
-				OGLockMutex(HidMutex);
-				printf( "10Setu %d\n", r );
-				if( swadge ) hid_close( swadge );
-				printf( "Setu\n" );
-				swadge = swadgehost_setup();
-				printf( "SC: %d\n", swadge );
-				OGUnlockMutex( HidMutex );
-			}
-			if( r < 7 ) break;
-			//
-		} while( 1 );
-
 		Sleep(1);
 	}
 }
@@ -350,6 +364,8 @@ int main( int argc, char ** argv )
 	char cts[256];
 	
 	osc = minioscInit( 0, 9993, "127.0.0.1", 0 );
+
+	OGCreateThread( RTMPTransmitThread, 0 );
 
 	CNFGSetup( argv[0], 480, 790);
 	SwadgeSetup();
@@ -727,96 +743,3 @@ const char * mycasestr( const char * haystack, const char * needle )
 	}
 	return 0;
 }
-
-
-#if 0
-
-
-
-void setup()
-{
-	EnumWindows(EnumWindowsProc, (LPARAM)0);
-	screen = GetDC(wnd);
-	target = CreateCompatibleDC(screen);
-    SetStretchBltMode(target, COLORONCOLOR);
-	printf( "WND: %d\nDC: %08x\nTARGET: %08x\n", wnd, screen, target );
-	if( wnd == 0 ) exit( - 1 );
-	width = 192;//GetSystemMetrics(SM_CXSCREEN);
-	height = 108;//GetSystemMetrics(SM_CYSCREEN);
-	bmp = CreateCompatibleBitmap(screen, width, height);
-	//DeleteObject( bmp );
-}
-uint32_t * bmpBuffer = 0;
-
-int main()
-{
-	COLORREF color=0xaaaaaaaa;
-	mutSendDataBank = OGCreateMutex();
-	
-	setup();
-	double st = OGGetAbsoluteTime();
-	
-	double delt = OGGetAbsoluteTime() - st;
-	printf( "Timing 1: %f\n", delt );
-	st = OGGetAbsoluteTime();
-	//for( iter = 0; iter < 10; iter++ )
-	while(1)
-	{
-		SelectObject(target, bmp);
-		BitBlt(target, 0, 0, width, height, screen, 0, 0, SRCCOPY | CAPTUREBLT);
-		PrintWindow( wnd, target, /*PW_RENDERFULLCONTENT */2 );
-
-		BITMAPINFO bminfo;
-		bminfo.bmiHeader.biBitCount = 32;
-		bminfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-		bminfo.bmiHeader.biCompression = BI_RGB;//BI_BITFIELDS;
-		bminfo.bmiHeader.biPlanes = 1;
-		bminfo.bmiHeader.biWidth = width;
-		bminfo.bmiHeader.biHeight = height;
-		bminfo.bmiHeader.biSizeImage = width * 4 * height; // must be DWORD aligned
-		bminfo.bmiHeader.biXPelsPerMeter = 0;
-		bminfo.bmiHeader.biYPelsPerMeter = 0;
-		bminfo.bmiHeader.biClrUsed = 0;
-		bminfo.bmiHeader.biClrImportant = 0;
-		
-
-		// get bitmap info from the bitmap
-		//ret = GetDIBits(mTarget, mBmp, 0, mHeight, NULL, (BITMAPINFO *) &bminfo, DIB_RGB_COLORS);
-		//assert(ret);
-
-		if( ! bmpBuffer ) bmpBuffer = malloc(bminfo.bmiHeader.biSizeImage);
-		memset( bmpBuffer, 0, bminfo.bmiHeader.biSizeImage );
-		int r = GetDIBits(target, bmp, 0, height, bmpBuffer, &bminfo, DIB_RGB_COLORS);
-		#if 0
-		printf( "RR2: %d\n", r );
-		FILE * f = fopen( "test.ppm", "wb" );
-		fprintf( f, "P6\n%d %d\n255\n", width, height );
-		//printf( "%08x %08x %08x\n", bmpBuffer[300], bmpBuffer[301], bmpBuffer[302] );
-		int x, y;
-		for( y = 0; y < height; y++ )
-		{
-			for( x = 0; x < width; x++ )
-			{
-				//printf( "%08x", bmpBuffer[x+y*width] );
-				uint8_t rk[3] = 
-				{
-					(bmpBuffer[x+y*width]>>16)&0xff,
-					(bmpBuffer[x+y*width]>>8)&0xff,
-					(bmpBuffer[x+y*width]>>0)&0xff,
-				};
-				fwrite( rk, 3, 1, f );
-			}
-			//printf( "\n" );
-		}
-		fclose( f );
-		#endif
-	}
-	double deltb = OGGetAbsoluteTime() - st;
-	printf( "Timings: %08x -> %f %f\n", color, delt, deltb );
-    ReleaseDC(NULL, screen);
-	return 0;
-}
-
-
-
-#endif
