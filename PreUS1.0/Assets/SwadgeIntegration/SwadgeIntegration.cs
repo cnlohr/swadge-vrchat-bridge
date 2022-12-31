@@ -15,6 +15,42 @@ public class SwadgeIntegration : UdonSharpBehaviour
 	private Vector4[] BoneData = new Vector4[84*12];
 	private int updateCount = 0;
 	
+	
+	private bool didUpdateBoolets;
+	private int  iUniqueBooletCounter;
+	private Vector4[] BooletStartLocation = new Vector4[240];
+	private Vector4[] BooletStartDirection = new Vector4[240];
+	private Vector4[] BooletStartDataTime = new Vector4[240]; // [in_use 0 or 1, a counter making a unique value starting at 0 and counting to 65535 and resetting to zero.]
+
+	private Vector4[] GunLocation = new Vector4[24];
+	private Vector4[] GunDirection = new Vector4[24]; // [in_use 0 or 1, a counter making a unique value starting at 0 and counting to 65535 and resetting to zero.]
+
+	public void UpdateBoolet( int boolet, Vector3 pos, Vector3 to )
+	{
+		BooletStartLocation[boolet] = pos;
+		BooletStartDirection[boolet] = to;
+
+		if( ++iUniqueBooletCounter == 0 )
+			++iUniqueBooletCounter;
+
+		BooletStartDataTime[boolet] = new Vector3( 1, iUniqueBooletCounter, 0 );
+		didUpdateBoolets = true;
+	}
+	
+	public void CancelBoolet( int boolet )
+	{
+		BooletStartLocation[boolet] = new Vector3( 0, 0, 0 );
+		BooletStartDirection[boolet] = new Vector3( 0, 0, 0 );
+		BooletStartDataTime[boolet] = new Vector3( 0, 0, 0 );
+		didUpdateBoolets = true;
+	}
+	
+	public void UpdateGun( int gun, Vector3 pos, Vector3 to )
+	{
+		GunLocation[gun] = pos;
+		GunDirection[gun] = to;
+	}
+	
     void Start()
     {
 		block = new MaterialPropertyBlock();
@@ -49,6 +85,19 @@ public class SwadgeIntegration : UdonSharpBehaviour
 
 		block.SetVector( "GenProps", new Vector4( updateCount, Time.timeSinceLevelLoad, 0, 0 ) );
 		block.SetVectorArray( "SkeletonData", BoneData );
+		
+		block.SetVectorArray( "GunLocations", GunLocation );
+		block.SetVectorArray( "GunDirection", GunDirection );
+		
+		if( didUpdateBoolets )
+		{
+			didUpdateBoolets = false;
+
+			block.SetVectorArray( "BooletStartLocation", BooletStartLocation );
+			block.SetVectorArray( "BooletStartDirection", BooletStartDirection );
+			block.SetVectorArray( "BooletStartDataTime", BooletStartDataTime );
+		}
+
 		mr.SetPropertyBlock(block);
 		updateCount++;
 	}

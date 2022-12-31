@@ -60,7 +60,6 @@ typedef struct
     uint8_t  reqColor;
     int8_t  velocity[3];
     int8_t  bones[0*3];  //Does not need to be all that long.
-
 } network_model_t;
 
 og_mutex_t HidMutex;
@@ -68,6 +67,7 @@ og_mutex_t HidMutex;
 #define MAX_RTMP_PLAYERS 90
 multiplayerpeer_t gOplayers[(MAX_RTMP_PLAYERS)];
 boolet_t gOboolets[(MAX_RTMP_PLAYERS)*4];
+int gObooletIDs[(MAX_RTMP_PLAYERS)*4];
 og_mutex_t rtmpOutLock;
 void * RTMPTransmitThread( void * v );
 void * SwadgeReceiver( void * v );
@@ -91,11 +91,14 @@ void HandleMotion( int x, int y, int mask ) { }
 void HandleDestroy() { }
 const char * mycasestr( const char * haystack, const char * needle );
 BOOL CALLBACK EnumWindowsProc( HWND hwnd, LONG lParam );
+int is_real_vrchat_window;
 
 #define MAX_VRC_PLAYERS 84
 
 og_mutex_t mutSendDataBank;
 float BonePositions[MAX_VRC_PLAYERS][12][3];
+#define MAX_GUNS 24
+network_model_t * modGuns[MAX_GUNS];
 int   LastSendPlayerPos;
 
 
@@ -115,7 +118,7 @@ void SendPacketToSwadge()
 	int i, j;
 	uint8_t buff[512];
 	uint8_t * pack = buff;
-	uint32_t now = (uint32_t)(OGGetAbsoluteTime() * 1000);
+	uint32_t now = (uint32_t)(OGGetAbsoluteTime() * 1000000);
 	int seed = now;
 
 	*((uint32_t*)pack) = FSNET_CODE_SERVER;  pack += 4;
@@ -420,6 +423,13 @@ int main( int argc, char ** argv )
 {
 	char cts[256];
 	
+	int i;
+	for( i = 0; i < MAX_GUNS; i++ )
+	{
+		modGuns = malloc( sizeof( network_model_t ) + 3 );
+	}
+
+	
 	osc = minioscInit( 0, 9993, "127.0.0.1", 0 );
 
 	OGCreateThread( RTMPTransmitThread, 0 );
@@ -482,10 +492,7 @@ int main( int argc, char ** argv )
 				Sleep(1);
 				continue;
 			}
-			
-			
-			//printf( "%08x %08x %08x\n", bmpBuffer[(height-1)*width+0], bmpBuffer[(height-1)*width+1],
-			//	bmpBuffer[(height-1)*width+2], bmpBuffer[(height-1)*width+3] );
+
 			if( r != height )
 			{
 				printf( "R/H: %d %d\n", r, height );
@@ -589,16 +596,46 @@ int main( int argc, char ** argv )
 				sprintf( cts, "%f %f %f\n", dataf[y][0][0], dataf[y][0][1], dataf[y][0][2] );
 				CNFGDrawText( cts, 2 );
 			}
-			
+
 			DeltaGameTime = dataf[4][0][1] - LastGameTime;
 			LastGameTime = dataf[4][0][1];
-
 
 			if( DeltaGameTime > 0 )
 			{
 				OGLockMutex( mutSendDataBank );
 				
 				// Player position.
+				for( y = 8; y < 248; y++ )
+				{
+					int bid = y - 8;
+					float enabled = dataf[y][2][0];
+					float id = dataf[y][2][1];
+					if( gObooletIDs[bid] != id )
+					{
+						boolet_t * b = gOboolets + bid;
+
+						b->timeOfLaunch = (uint32_t)(OGGetAbsoluteTime() * 1000000);
+
+
+						b->launchLocation[0] = dataf[y][0][0] * 64;
+						b->launchLocation[1] = dataf[y][0][1] * 64;
+						b->launchLocation[2] = dataf[y][0][2] * 64;
+						
+						// Figure out the pitch/yaw of the shot.
+						float dX = dataf[y][1][0];
+						float dY = dataf[y][1][1];
+						float dZ = dataf[y][1][2];
+
+						float tau = atan2( dX, dZ );
+						float mR  = sqrt( dX * dX + dY * dY );
+						float gam = atan2( dZ, mR );
+						
+						b->launchRotation[0] = tau * 3920 / 6.2831852;
+						b->launchRotation[1] = gam * 3920 / 6.2831852;
+						b->flags = id;
+					}
+				}
+				
 				for( y = 248; y < 584; y++ )
 				{
 					if( y < 248+10 )
@@ -618,9 +655,67 @@ int main( int argc, char ** argv )
 						BonePositions[playerid][fieldno][1] = dataf[y][field][1];
 						BonePositions[playerid][fieldno][2] = dataf[y][field][2];
 					}
-					
-					
 				}
+
+				for( y = 584; y < 608; y++ )
+				{
+					int gid = y - 584;
+					network_model_t * g = modGuns[gid];				
+					g->timeOfUpdate = (uint32_t)(OGGetAbsoluteTime() * 1000000);
+
+					g->root[0] = dataf[y][0][0] * 64;
+					g->root[1] = dataf[y][0][1] * 64;
+					g->root[2] = dataf[y][0][2] * 64;
+
+					g->bones[0] = ( dataf[y][1][0] - dataf[y][0][0] ) * 64;
+					g->bones[1] = ( dataf[y][1][1] - dataf[y][0][1] ) * 64;
+					g->bones[2] = ( dataf[y][1][2] - dataf[y][0][2] ) * 64;
+#if 0
+			int nrbones = hasSkeleton?12:1;
+
+			// First is a codeword.  Contains ID, bones, bone mapping.
+			uint32_t codeword = ((LastSendPlayerPos)) | ((nrbones-1)<<8);
+
+			int sbl = 4+8;
+			
+			if( hasSkeleton )
+			{
+				/*
+				codeword |= 1 << (sbl++); // To Neck
+				codeword |= 1 << (sbl++); // To Left-Forearm
+				codeword |= 1 << (sbl++); // To Left-Hand
+				codeword |= 0 << (sbl++);  // 0 is yes, reset back to zero.
+				codeword |= 0 << (sbl++);  // ---> Go back to Neck
+				codeword |= 1 << (sbl++); // To Right-Forearm
+				codeword |= 1 << (sbl++); // To Right-Hand
+				//?? Extra 1?
+				codeword |= 0 << (sbl++);  // 0 is yes, reset back to zero.
+				codeword |= 0 << (sbl++);  // ---> Go back to Neck
+				codeword |= 1 << (sbl++); // To Head
+				codeword |= 0 << (sbl++);  // 0 is yes, reset back to zero.
+				codeword |= 1 << (sbl++); // Go to left leg. (AND DRAW)
+				codeword |= 1 << (sbl++); // Go to left foot.
+				codeword |= 0 << (sbl++);  // 0 is yes, reset back to zero.
+				codeword |= 1 << (sbl++); // Go to right leg. (AND DRAW)
+				codeword |= 1 << (sbl++); // Go to right foot.
+				*/
+				// Above generates the following:
+				codeword |= 0b1011001100110111<<sbl; sbl+=16;
+					//0b1100110011100111<<sbl; sbl+=16;  //WORKS, right leg
+			}
+			else
+			{
+				// Just one bone, we're a pointy boi.
+				codeword |= 1 << (sbl++);
+	#endif
+					g->binencprop = (gid + MAX_VRC_PLAYERS) | ( 1<<8 ) | ( 1<<16 ); 
+					g->radius = 64;
+					g->reqColor = 180; // red
+					g->velocity[0] = 0;
+					g->velocity[1] = 0;
+					g->velocity[2] = 0;
+				}
+
 				
 				OGUnlockMutex( mutSendDataBank );
 			}
@@ -688,6 +783,7 @@ int main( int argc, char ** argv )
 		else
 		{
 			// Keep searching
+			is_real_vrchat_window = 0;
 			EnumWindows( (WNDENUMPROC)EnumWindowsProc, (LPARAM)0 );
 			CNFGPenX = 65; CNFGPenY = 0;
 			CNFGDrawText( "Searching for VRChat", 2 );
@@ -761,11 +857,12 @@ BOOL CALLBACK EnumWindowsProc( HWND hwnd, LONG lParam )
 	{
 		printf( "%s / %s / %d %d\n", windowname, windowexe, rect.right, rect.bottom );
 		printf( "********\n" );
+		is_real_vrchat_window = 1;
 		wnd = hwnd;
 	}
 
 	if( mycasestr( windowexe, "editor\\unity" ) && rect.right > 10 && rect.bottom > 10 && 
-		mycasestr( windowname, "PC, Mac & Linux Standalone" ) )
+		mycasestr( windowname, "PC, Mac & Linux Standalone" ) && !is_real_vrchat_window )
 	{
 		printf( "%s / %s / %d %d\n", windowname, windowexe, rect.right, rect.bottom );
 		printf( "********\n" );

@@ -204,7 +204,8 @@
 					if( sp.y >= 0x80 ) sp.y += 0xffffff00;
 					if( sp.z >= 0x80 ) sp.z += 0xffffff00;
 					int3 srworld = sp;
-					return float4( ( srworld + 0.5 ) / 256.0 * 3.1415926 * 2, 1.0 );  // Output in radians.
+					// NO IDEA why need + 1.0
+					return float4( ( srworld + 1.0 ) / 256.0 * 3.1415926 * 2, 1.0 );  // Output in radians.
 				}
 				case 4:
 				{

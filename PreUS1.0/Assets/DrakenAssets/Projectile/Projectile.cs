@@ -9,14 +9,16 @@ namespace Bhenaniguns
     public class Projectile : UdonSharpBehaviour
     {
         [Header("Components")]
+        [SerializeField] private HandCannon _cannon = null;
         [SerializeField] private Collider _cannonCollider = null;
-        [SerializeField] private HitReporter _hitReporter = null;
+        //[SerializeField] private HitReporter _hitReporter = null;
         private string _firingPlayer = "";
         private string _targetHit = "";
         [SerializeField] private Rigidbody _selfRigidBody = null;
         [SerializeField] private Animator _selfAnimator = null;
         [SerializeField] private Collider _selfCollider = null;
         [SerializeField] private ParentConstraint _parentConstraint = null;
+        [HideInInspector] public int _manProjIndex = -1;
 
         [Header("Projectile Settings")]
         [SerializeField] private int _hitLayer = 0;
@@ -37,6 +39,8 @@ namespace Bhenaniguns
 
         private void OnEnable()
         {
+            _manProjIndex = _cannon._manProjIndex + _cannon._projectileIndex;
+
             _audioFired.pitch = Random.Range(_audioPitchMin, _audioPitchMax);
             _audioHit.pitch = Random.Range(_audioPitchMin, _audioPitchMax);
             _audioMissed.pitch = Random.Range(_audioPitchMin, _audioPitchMax);
@@ -66,15 +70,17 @@ namespace Bhenaniguns
                 _selfRigidBody.useGravity = false;
                 _selfRigidBody.velocity = _fullstop;
 
-                //if ( 0 ) //_useExperimentalStick && Physics.Raycast(_exerimentalRayOrigin.position, (_exerimentalRayOrigin.rotation * _exerimentalRayOrigin.right), out RaycastHit _raycastHit, 3, _hitLayer, QueryTriggerInteraction.UseGlobal))
-                //{
-                    //Debug.LogWarning("Raycast Hit", gameObject);
-                    //transform.position = _raycastHit.point;
+/*
+                if (_useExperimentalStick && Physics.Raycast(_exerimentalRayOrigin.position, (_exerimentalRayOrigin.rotation * _exerimentalRayOrigin.right), out RaycastHit _raycastHit, 3, _hitLayer, QueryTriggerInteraction.UseGlobal))
+                {
+                    Debug.LogWarning("Raycast Hit", gameObject);
+                    transform.position = _raycastHit.point;
                     //Relocate Projectile to contact position
                     //Parent Projectile to contacted object
-                //}
-               // else
-                //{
+                }
+                else
+                {
+					*/
                     //Debug.LogWarning("No Raycast", gameObject);
                     //Grab what the current scale is, so it can be hopefully adjusted to remain the same after being parented to whatever it hit. Parented objects will have to be scaled uniformly for this to work as intended.
                     Vector3 _oldWorldscale = transform.lossyScale;
@@ -87,14 +93,14 @@ namespace Bhenaniguns
                     _parentConstraint.constraintActive = true;
                     //transform.SetParent(_other.transform);
                     transform.localScale += (_oldWorldscale - transform.lossyScale);
-               // }
+                //}
 
                 if (_other.gameObject.layer == _hitLayer)
                 {
                     if (Networking.LocalPlayer.displayName == _firingPlayer)
                     {
                         _targetHit = _other.name;
-                        _hitReporter._projectileForwardedNotice(_firingPlayer, _targetHit);
+                        //_hitReporter._projectileForwardedNotice(_firingPlayer, _targetHit);
                     }
                     _selfAnimator.SetTrigger("ProjectileHit");
                 }

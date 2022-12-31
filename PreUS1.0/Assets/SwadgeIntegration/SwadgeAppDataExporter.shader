@@ -77,15 +77,11 @@
 			}
 
 			float3 GunLocations[24];
-			float3 GunVelocities[24];
-			float4 GunRotations[24];
-			float GunAssociatedPlayerID[24]; // Set to -1 for not being held.  Otherwise, use playerID from my player interface (TODO)
-			int NumGuns; //MUST be gun 0...NumGuns
+			float3 GunDirection[24];
 			
 			float3 BooletStartLocation[240];
 			float3 BooletStartDirection[240];
 			float3 BooletStartDataTime[240]; // [in_use 0 or 1, a counter making a unique value starting at 0 and counting to 65535 and resetting to zero.]
-			int NumBoolets;
 
 			float3 SkeletonData[12*84];
 			float3 GenProps;
@@ -173,9 +169,15 @@
 						// * Up to 256 boolets.
 						//	at: <xyz> dir: <xyz>  props: <unique ID, emission time>
 						//Each line: <boolet> <boolet>
-						
-						//BOOLETS ARE CURRENTLY UNUSED.
-						testvar = 0;//2.2;
+					
+						if( compcoord.x == 0 )
+							testvar = BooletStartLocation[sp.y-8];
+						else if( compcoord.x == 1 )
+							testvar = BooletStartDirection[sp.y-8];
+						else if( compcoord.x == 2 )
+							testvar = BooletStartDataTime[sp.y-8];
+						else
+							return float4( 0.1, 0.0, 0.0, 1.0 );
 					}
 					else if( sp.y < 584 ) // 84*4+248
 					{
@@ -191,7 +193,12 @@
 					{
 						// Guns are
 						//    <coord base> <dir xyz> <trigger amount, reserved.yz>
-						testvar = 0;//0.1;						
+						if( compcoord.x == 0 )
+							testvar = GunLocations[sp.y-584];
+						else if( compcoord.x == 1 )
+							testvar = GunDirection[sp.y-584];
+						else
+							return float4( 0.0, 0.1, 0.0, 1.0 );
 					}
 					else
 					{

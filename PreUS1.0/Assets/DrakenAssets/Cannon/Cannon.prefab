@@ -197,15 +197,16 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 5844912547858170138}
+  _cannon: {fileID: 5844912547732006068}
   _cannonCollider: {fileID: 238416908453472942}
-  _hitReporter: {fileID: 5445764588861956129}
   _selfRigidBody: {fileID: 5844912547858170139}
   _selfAnimator: {fileID: 5844912547858170142}
   _selfCollider: {fileID: 3879212221190604100}
   _parentConstraint: {fileID: 2025481431097250533}
+  _manProjIndex: -1
   _hitLayer: 23
   _velocity: {x: 762.9, y: 0, z: 0}
-  _timeout: 5
+  _timeout: 15
   _useExperimentalStick: 0
   _exerimentalRayOrigin: {fileID: 4183681259028651288}
   _audioFired: {fileID: 5844912547858170143}
@@ -968,8 +969,12 @@ MonoBehaviour:
   _cannonPickup: {fileID: 5844912549080699988}
   _projectile: {fileID: 3879212221190604103}
   _quantityLimit: 4
+  _projectiles: []
+  _projectileIndex: 0
   _cooldown: 0.33
   _coyoteFireWindow: 0.15
+  _dataManager: {fileID: 0}
+  _manProjIndex: 0
 --- !u!114 &5844912547732006069
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6019,7 +6024,7 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 5844912549080699985}
-  _targetScript: {fileID: 5844912547732006069}
+  _targetScript: {fileID: 5844912547732006068}
 --- !u!114 &5844912549080699985
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6150,7 +6155,8 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 5844912549482220126}
-  _projectileRoot: {fileID: 3879212221190604103}
+  _cannon: {fileID: 5844912547732006068}
+  _projectile: {fileID: 5844912547858170133}
 --- !u!114 &5844912549482220126
 MonoBehaviour:
   m_ObjectHideFlags: 0

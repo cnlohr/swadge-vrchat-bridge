@@ -7,8 +7,12 @@ namespace Bhenaniguns
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class ManualSyncProxy : UdonSharpBehaviour
     {
-		// XXX MOD CNL XXX
-        [SerializeField] HandCannon _targetScript = null;
+        [SerializeField] private HandCannon _targetScript = null;
+
+        public HandCannon _getTargetScript()
+        {
+            return _targetScript;
+        }
 
         public override void OnDrop()
         {
@@ -22,7 +26,6 @@ namespace Bhenaniguns
 
         public override void OnPickupUseDown()
         {
-			Debug.Log( "ManualSyncProxy OnPickupUseDown" );
             _targetScript.SendCustomEvent("_proxyOnPickupUseDown");
         }
 
