@@ -2,6 +2,8 @@
 #define BOOLETSPERPLAYER 4
 #define MAX_BOOLETS (MAX_PEERS*BOOLETSPERPLAYER)
 
+int akey = 0;
+
 void * RTMPTransmitThread( void * v )
 {
 	printf( "RTMPTransmitThread()\n" );
@@ -74,7 +76,7 @@ void * RTMPTransmitThread( void * v )
 		}
 
 
-		int akey = 0;
+		//int akey = 0;
 		#define g_mbw 8
 		#define g_mbh 6
 		int w = g_mbw * 16;

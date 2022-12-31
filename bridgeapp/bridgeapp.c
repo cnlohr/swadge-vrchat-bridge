@@ -84,7 +84,7 @@ int offset_x, offset_y;
 miniosc * osc;
 float fSendTimeMS;
 
-void HandleKey( int keycode, int bDown ){}
+void HandleKey( int keycode, int bDown ){ if( keycode == ' ' && bDown ) akey = !akey; }
 void HandleButton( int x, int y, int button, int bDown ) { }
 void HandleMotion( int x, int y, int mask ) { }
 void HandleDestroy() { }
