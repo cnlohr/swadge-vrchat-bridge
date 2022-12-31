@@ -280,9 +280,9 @@ void SendPacketToSwadge()
 					if( emitBone == 1 )
 					{
 						//TRICKY: Make heads look bigger.  Otherwise it looks jankey.
-						((int8_t*)pack)[0] *= 3;
-						((int8_t*)pack)[1] *= 3;
-						((int8_t*)pack)[2] *= 3;
+						((int8_t*)pack)[0] *= 2;
+						((int8_t*)pack)[1] *= 2;
+						((int8_t*)pack)[2] *= 2;
 					}
 					cursor[0] = newp[0];
 					cursor[1] = newp[1];
@@ -376,6 +376,7 @@ void SendPacketToSwadge()
 	acbits += WriteUEQ( &assetCounts, sendmod ); //models
 	acbits += WriteUEQ( &assetCounts, sendshp ); // ships
 	acbits += WriteUEQ( &assetCounts, sendboo ); // boolets
+	acbits += WriteUQ( &assetCounts, 1, 1 );
 	FinalizeUEQ( &assetCounts, acbits );
 	*assetCountsPlace = assetCounts;
 

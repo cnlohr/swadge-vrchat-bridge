@@ -162,7 +162,7 @@
 					uint basePeerFlags = DecodeShipData( shipno, 16 );
 					uint shiptou = DecodeShipData( shipno, 0 ) + (DecodeShipData( shipno, 1 )<<8) + (DecodeShipData( shipno, 2 )<<16) + (DecodeShipData( shipno, 3 )<<24);
 					uint lastutime = asuint(SelfData(int2(1,0)).z);
-					return float4( ( int(lastutime - virtualclock) ) / 1000000.0, basePeerFlags != 0, 0.0, 1.0 ); //NOTE SPARE FIELD
+					return float4( ( int(shiptou - virtualclock) ) / 1000000.0, basePeerFlags != 0, 0.0, 1.0 ); //NOTE SPARE FIELD
 				}
 				case 1: // Ship's position
 				{
@@ -204,7 +204,7 @@
 					if( sp.y >= 0x80 ) sp.y += 0xffffff00;
 					if( sp.z >= 0x80 ) sp.z += 0xffffff00;
 					int3 srworld = sp;
-					return float4( srworld / 255.0 * 3.1415926 * 2, 1.0 );  // Output in radians.
+					return float4( ( srworld + 0.5 ) / 256.0 * 3.1415926 * 2, 1.0 );  // Output in radians.
 				}
 				case 4:
 				{
@@ -259,8 +259,9 @@
 					return last;
 				}
 				case 7:
-					// Reserved
+				{
 					return 0;
+				}
 				case 8:
 				case 9:
 				case 10:
@@ -306,10 +307,47 @@
 					float3 direction = float3( sin( hpr2.x ) * yawDivisor,  -sin( hpr2.y ), cos( hpr2.x ) * yawDivisor );
 
 					return float4( direction, 1.0 );
-					
-
-
 				}
+				case 20:
+				{
+					// Compute position.
+					float3 wp = SelfData( uint2( selfCoord.x, 1 ) );
+					float3 wv = SelfData( uint2( selfCoord.x, 2 ) );
+					float3 wt = SelfData( uint2( selfCoord.x, 0 ) );
+					float3 lp = SelfData( uint2( selfCoord.x, 20 ) );  //Last position
+					float3 dt = SelfData( uint2(  1, 1 ) );
+					
+					float3 compPos = wp + wv * ( -wt.x );
+					
+					float3 diff = compPos - lp;
+					
+					const float coeff = 15.0;
+					
+					if( length(diff)>10 )
+						lp = compPos;
+					else
+						lp = lerp( compPos, lp, exp( -dt.y * coeff ) );
+
+					return float4( lp, 1.0 );
+				}	
+				case 21:
+				{
+					// Compute position.
+					float3 hpra = SelfData( uint2( selfCoord.x, 3 ) );
+					float3 lr = SelfData( uint2( selfCoord.x, 21 ) );  //Last rotation
+					float3 dt = SelfData( uint2(  1, 1 ) );
+					
+					const float coeff = 15.0;
+					
+					float3 diff = hpra - lr;
+					diff = fmod( fmod( diff + 3.14159, 6.28318 ) + 6.28318, 6.28318 ) - 3.14159;
+					
+					diff = lerp( diff, 0.0, exp( -dt.y * coeff ) );
+					
+					lr += diff;
+
+					return float4( lr, 1.0 );
+				}	
 				default:
 					return 0.0;
 				}

@@ -87,6 +87,7 @@
 				o.uv = input[i].uv;
 				float4 objectPlace = float4(input[i].vertex);
 				
+			
 				
 				if( isShip )
 				{
@@ -104,8 +105,7 @@
 						objectPlace.xyz += perdir * deathprops.x;
 					}
 				
-
-					float3 hpra = _GeometryTex[uint2( columnInGeoTex, 3 )];
+					float3 hpra = _GeometryTex[uint2( columnInGeoTex, 21)];
 
 					// from tdRotateNoMulEA on the swadge.
 					float cy = cos( hpra[0] ); // NOTICE: FLIPPED CX/CY
@@ -143,13 +143,13 @@
 
 				if( isShip )
 				{
-					worldPlace.xyz += _GeometryTex[uint2( columnInGeoTex, 1)] +
-									  _GeometryTex[uint2( columnInGeoTex, 2)] * -_GeometryTex[uint2( columnInGeoTex, 0)].x;
-									  
+					if( length( _GeometryTex[uint2( columnInGeoTex, 1)].xyz ) == 0 ) return;
+					worldPlace.xyz += _GeometryTex[uint2( columnInGeoTex, 20)];
   					if( length( o.debug ) == 0 ) o.debug.r = -2;
 				}
 				else
 				{
+					if( length( _GeometryTex[uint2( columnInGeoTex, 12+bananaNo)].xyz ) == 0 ) return;
 					worldPlace.xyz += _GeometryTex[uint2( columnInGeoTex, 12+bananaNo)] +
 									  _GeometryTex[uint2( columnInGeoTex, 16+bananaNo)] * _GeometryTex[uint2( columnInGeoTex, 8+bananaNo)].x * 7.629;
 									  

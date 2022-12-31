@@ -324,6 +324,7 @@ void * SwadgeReceiver( void * v )
 				//printf( "SC: %d\n", swadge );
 				OGUnlockMutex( HidMutex );
 			}
+
 			if( r < 7 ) break; // break = go to sleep for a bit.
 			
 			if( memcmp( data+7, "\x53\x46\x53\x66", 4 ) != 0 )
@@ -385,7 +386,6 @@ void * SwadgeReceiver( void * v )
 			// Compute "now" in peer time.
 			uint32_t peerSendInOurTime = timeOnPeer - thisPeer->timeOffsetOfPeerFromNow;
 
-			
 			// We are only accepting peers.
 			int isPeer = 1; int readID = 0;
 			
