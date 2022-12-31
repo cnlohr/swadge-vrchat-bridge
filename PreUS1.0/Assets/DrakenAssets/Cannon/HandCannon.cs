@@ -159,14 +159,14 @@ namespace Bhenaniguns
             }
             GameObject _fired = VRCInstantiate(_projectile);
             _projectiles[_projectileIndex] = _fired;
+            _fired.transform.position = _firePosition;
+            _fired.transform.rotation = _fireRotation;
             if (_dataManager != null)
             {
                 //Report Fired Projectile
                 _dataManager._projectileFired(_fireTime, Networking.GetOwner(_cannonPickup.gameObject).displayName, _manCanIndex, _manProjIndex + _projectileIndex, _fired.transform);
             }
-            _fired.transform.position = _firePosition;
-            _fired.transform.rotation = _fireRotation;
-            Debug.Log("t" + _fireTime + ",py" + _firePosition.y + ",px" + _firePosition.x + ",pz" + _firePosition.z + ",rw" + _fireRotation.w + ",rx" + _fireRotation.x + ",ry" + _fireRotation.y + ",rz" + _fireRotation.z, gameObject);
+            //Debug.Log("t" + _fireTime + ",py" + _firePosition.y + ",px" + _firePosition.x + ",pz" + _firePosition.z + ",rw" + _fireRotation.w + ",rx" + _fireRotation.x + ",ry" + _fireRotation.y + ",rz" + _fireRotation.z, gameObject);
             _fired.SetActive(true);
         }
     }

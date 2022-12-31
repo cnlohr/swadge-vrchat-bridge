@@ -66,8 +66,7 @@ og_mutex_t HidMutex;
 
 #define MAX_RTMP_PLAYERS 90
 multiplayerpeer_t gOplayers[(MAX_RTMP_PLAYERS)];
-boolet_t gOboolets[(MAX_RTMP_PLAYERS)*4];
-int gObooletIDs[(MAX_RTMP_PLAYERS)*4];
+boolet_t gOboolets[(MAX_RTMP_PLAYERS)*4+240];
 og_mutex_t rtmpOutLock;
 void * RTMPTransmitThread( void * v );
 void * SwadgeReceiver( void * v );
@@ -100,6 +99,8 @@ float BonePositions[MAX_VRC_PLAYERS][12][3];
 #define MAX_GUNS 24
 network_model_t * modGuns[MAX_GUNS];
 int   LastSendPlayerPos;
+int   LastGunSendPos;
+int   LastBooletSendPos;
 
 
 int IsVec3Zero( float * vec )
@@ -304,8 +305,71 @@ void SendPacketToSwadge()
 		}
 		LastSendPlayerPos++;
 		if(LastSendPlayerPos == MAX_VRC_PLAYERS ) LastSendPlayerPos = 0;
-		if( sendmod == 3 ) break; // Set max # of players/models to send per frame.
+		if( sendmod >= 2 ) break; // Set max # of players/models to send per frame.
 	}
+	#if 0
+	for( i = 0; i < sizeof(modGuns) / sizeof(modGuns[0] ); i++ )
+	{
+		// Guns
+		network_model_t * g = modGuns[LastGunSendPos];
+		if( g->root[0] || g->root[1] || g->root[2] )
+		{
+			*((uint32_t*)pack) = g->binencprop; pack += 4;
+			memcpy( pack, g->root, sizeof( g->root ) ); pack += sizeof( g->root );
+			*(pack++) = g->radius;
+			*(pack++) = g->reqColor;
+			memcpy( pack, g->velocity, sizeof( g->velocity ) ); pack += sizeof( g->velocity );
+			memcpy( pack, g->bones, 3 ); pack += 3;
+			sendmod++;
+		}
+		LastGunSendPos++;
+		if( LastGunSendPos == sizeof(modGuns) / sizeof(modGuns[0] ) ) LastGunSendPos = 0;
+		if( sendmod >= 4 ) break;
+	}
+	#endif
+	for( i = (MAX_RTMP_PLAYERS)*4; i < sizeof(gOboolets) / sizeof(gOboolets[0] ); i++ )
+	{
+		// Boolets
+		boolet_t * b = gOboolets + LastBooletSendPos;
+		if( b->flags )
+		{
+			sendboo++;
+			*(pack++) = LastBooletSendPos-(MAX_RTMP_PLAYERS)*4; // Local "bulletID"
+			memcpy( pack, &b->timeOfLaunch, sizeof( b->timeOfLaunch ) ); pack += sizeof( b->timeOfLaunch );
+			memcpy( pack, b->launchLocation, sizeof( b->launchLocation) ); pack += sizeof( b->launchLocation );
+			memcpy( pack, b->launchRotation, sizeof( b->launchRotation) ); pack += sizeof( b->launchRotation );
+			memcpy( pack, &b->flags, sizeof(b->flags) ); pack += sizeof( b->flags );
+		}
+		
+		LastBooletSendPos++;
+		if( LastBooletSendPos == sizeof(gOboolets) / sizeof(gOboolets[0] ) ) LastBooletSendPos = (MAX_RTMP_PLAYERS)*4;
+		if( sendboo >= 5 ) break;
+	}
+					
+#if 0
+	// Now, need to send boolets.
+	for( i = 0; i < 5; i++ )
+	{
+		sendboo++;
+		
+		int16_t loc[3];
+		int16_t rot[2] = { 0 };
+		rot[1] = 1000;
+		uint16_t bid = i+1 +send_no;
+
+		int ang = (i*30+(now >> 12)) % 360;
+		loc[0] = i;//getSin1024( ang )>>3;
+		loc[1] = 500;
+		loc[2] = 0;//getCos1024( ang )>>3;
+
+		*(pack++) = i+send_no; // Local "bulletID"
+		memcpy( pack, &now, sizeof(now) ); pack += sizeof( now );
+		memcpy( pack, loc, sizeof(loc) ); pack += sizeof( loc );
+		memcpy( pack, rot, sizeof(rot) ); pack += sizeof( rot );
+		memcpy( pack, &bid, sizeof(bid) ); pack += sizeof( bid );
+	}
+#endif
+
 
 #if 0
 	// DEMO SHIPS
@@ -337,39 +401,9 @@ void SendPacketToSwadge()
 	}
 	#endif
 	
-	// REAL SHIPS.
-	for( i = 0; i < 0; i++ )
-	{
-		//sendshp++;
-		
-		// TODO.
-	}
-
-
-	// Now, need to send boolets.
-	for( i = 0; i < 5; i++ )
-	{
-		sendboo++;
-		
-		int16_t loc[3];
-		int16_t rot[2] = { 0 };
-		rot[1] = 1000;
-		uint16_t bid = i+1 +send_no;
-
-		int ang = (i*30+(now >> 12)) % 360;
-		loc[0] = i;//getSin1024( ang )>>3;
-		loc[1] = 500;
-		loc[2] = 0;//getCos1024( ang )>>3;
-
-		*(pack++) = i+send_no; // Local "bulletID"
-		memcpy( pack, &now, sizeof(now) ); pack += sizeof( now );
-		memcpy( pack, loc, sizeof(loc) ); pack += sizeof( loc );
-		memcpy( pack, rot, sizeof(rot) ); pack += sizeof( rot );
-		memcpy( pack, &bid, sizeof(bid) ); pack += sizeof( bid );
-	}
-
+	
 	OGUnlockMutex( mutSendDataBank );
-	printf( "PL: %d\n", pack - buff );
+	printf( "PL: %d %d\n", pack - buff, now );
 
 	
 	uint32_t assetCounts = 0;
@@ -426,7 +460,7 @@ int main( int argc, char ** argv )
 	int i;
 	for( i = 0; i < MAX_GUNS; i++ )
 	{
-		modGuns = malloc( sizeof( network_model_t ) + 3 );
+		modGuns[i] = malloc( sizeof( network_model_t ) + 3 );
 	}
 
 	
@@ -607,32 +641,33 @@ int main( int argc, char ** argv )
 				// Player position.
 				for( y = 8; y < 248; y++ )
 				{
-					int bid = y - 8;
-					float enabled = dataf[y][2][0];
-					float id = dataf[y][2][1];
-					if( gObooletIDs[bid] != id )
+					int bid = (y - 8)+(MAX_RTMP_PLAYERS)*4;
+					int enabled = dataf[y][2][0];
+					int id = dataf[y][2][1];
+					if( gOboolets[bid].flags != id )
 					{
 						boolet_t * b = gOboolets + bid;
 
 						b->timeOfLaunch = (uint32_t)(OGGetAbsoluteTime() * 1000000);
 
-
-						b->launchLocation[0] = dataf[y][0][0] * 64;
+						b->launchLocation[0] = -dataf[y][0][0] * 64;
 						b->launchLocation[1] = dataf[y][0][1] * 64;
 						b->launchLocation[2] = dataf[y][0][2] * 64;
 						
 						// Figure out the pitch/yaw of the shot.
-						float dX = dataf[y][1][0];
+						float dX = -dataf[y][1][0];
 						float dY = dataf[y][1][1];
 						float dZ = dataf[y][1][2];
 
 						float tau = atan2( dX, dZ );
-						float mR  = sqrt( dX * dX + dY * dY );
-						float gam = atan2( dZ, mR );
+						float mR  = sqrt( dX * dX + dZ * dZ );
+						float gam = -atan2( dY, mR );
 						
 						b->launchRotation[0] = tau * 3920 / 6.2831852;
 						b->launchRotation[1] = gam * 3920 / 6.2831852;
 						b->flags = id;
+						
+						printf( "Launch Boolet! %f %f %f %f / %d %d %d / %d\n", dX, dY, dZ, mR, y, bid, id, b->timeOfLaunch );
 					}
 				}
 				
@@ -670,45 +705,8 @@ int main( int argc, char ** argv )
 					g->bones[0] = ( dataf[y][1][0] - dataf[y][0][0] ) * 64;
 					g->bones[1] = ( dataf[y][1][1] - dataf[y][0][1] ) * 64;
 					g->bones[2] = ( dataf[y][1][2] - dataf[y][0][2] ) * 64;
-#if 0
-			int nrbones = hasSkeleton?12:1;
-
-			// First is a codeword.  Contains ID, bones, bone mapping.
-			uint32_t codeword = ((LastSendPlayerPos)) | ((nrbones-1)<<8);
-
-			int sbl = 4+8;
-			
-			if( hasSkeleton )
-			{
-				/*
-				codeword |= 1 << (sbl++); // To Neck
-				codeword |= 1 << (sbl++); // To Left-Forearm
-				codeword |= 1 << (sbl++); // To Left-Hand
-				codeword |= 0 << (sbl++);  // 0 is yes, reset back to zero.
-				codeword |= 0 << (sbl++);  // ---> Go back to Neck
-				codeword |= 1 << (sbl++); // To Right-Forearm
-				codeword |= 1 << (sbl++); // To Right-Hand
-				//?? Extra 1?
-				codeword |= 0 << (sbl++);  // 0 is yes, reset back to zero.
-				codeword |= 0 << (sbl++);  // ---> Go back to Neck
-				codeword |= 1 << (sbl++); // To Head
-				codeword |= 0 << (sbl++);  // 0 is yes, reset back to zero.
-				codeword |= 1 << (sbl++); // Go to left leg. (AND DRAW)
-				codeword |= 1 << (sbl++); // Go to left foot.
-				codeword |= 0 << (sbl++);  // 0 is yes, reset back to zero.
-				codeword |= 1 << (sbl++); // Go to right leg. (AND DRAW)
-				codeword |= 1 << (sbl++); // Go to right foot.
-				*/
-				// Above generates the following:
-				codeword |= 0b1011001100110111<<sbl; sbl+=16;
-					//0b1100110011100111<<sbl; sbl+=16;  //WORKS, right leg
-			}
-			else
-			{
-				// Just one bone, we're a pointy boi.
-				codeword |= 1 << (sbl++);
-	#endif
-					g->binencprop = (gid + MAX_VRC_PLAYERS) | ( 1<<8 ) | ( 1<<16 ); 
+					
+					g->binencprop = (gid + MAX_VRC_PLAYERS) | ( 0<<8 ) | ( 0b11<<16 ); 
 					g->radius = 64;
 					g->reqColor = 180; // red
 					g->velocity[0] = 0;
