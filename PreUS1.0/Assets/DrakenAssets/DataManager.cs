@@ -42,7 +42,9 @@ namespace Bhenaniguns
                     if (_cannons[i] != null)
                     {
                         //Projectiles spawn with their facing already, just update positions here.
-						swadgeIntegrator.UpdateGun( i, _cannons[i].transform.position, _cannons[i].transform.right );
+						// "forward" is actually up
+						// "right" is actually "left" (could be -x universe bug)
+						swadgeIntegrator.UpdateGun( i, _cannons[i].transform.position, _cannons[i].transform.up );
                     }
                 }
             }

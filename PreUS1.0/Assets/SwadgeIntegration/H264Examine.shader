@@ -72,9 +72,9 @@
 
 				//uv.x = 1. - uv.x;
 				float2 tx = uv*float2(128,16*3);
-				int2 cpos = floor(tx.xy);
+				uint2 cpos = floor(tx.xy);
 				float am = 0;
-				int2 cell = int2( cpos.x / 8, cpos.y );
+				uint2 cell = int2( cpos.x / 8, cpos.y );
 
 				if( (cpos.x & 7) == 7 )
 				{

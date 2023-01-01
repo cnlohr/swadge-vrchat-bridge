@@ -118,16 +118,37 @@
 				}
 				else if( selfCoord.x == 2 )
 				{
-					// Debugging/validation SHOLD BE BLACK
-					uint dectime    =      InData(int2( 16, 0 ))  + (      InData(int2( 18, 0 ))  << 8 ) + (      InData( int2(20, 0 ))  << 16 ) + (      InData(int2( 22, 0 )) << 24 );
-					uint invdectime = (255-InData(int2( 17, 0 ))) + ( (255-InData(int2( 19, 0 ))) << 8 ) + ( (255-InData( int2(21, 0 ))) << 16 ) + ( (255-InData(int2( 23, 0 ))) << 24 );
-					
-					uint sentr    =      InData(int2( 16, 1 ))  + (      InData(int2( 18, 1 ))  << 8 ) + (      InData( int2(20, 1 ))  << 16 ) + (      InData(int2( 22, 1 )) << 24 );
-					uint invsentr = (255-InData(int2( 17, 1 ))) + ( (255-InData(int2( 19, 1 ))) << 8 ) + ( (255-InData( int2(21, 1 ))) << 16 ) + ( (255-InData(int2( 23, 1 ))) << 24 );
-					//|| sentr != invsentr
-					return float4( dectime != invdectime , asuint(SelfData(int2(0,0)).y) != 370000001,  sentr != 0x5AAA0fff, 1 );
-					
-					//Can debug (virtualclock-dectime)/1000000.0
+					if( selfCoord.y == 0 )
+					{
+						// Debugging/validation SHOLD BE BLACK
+						uint dectime    =      InData(int2( 16, 0 ))  + (      InData(int2( 18, 0 ))  << 8 ) + (      InData( int2(20, 0 ))  << 16 ) + (      InData(int2( 22, 0 )) << 24 );
+						uint invdectime = (255-InData(int2( 17, 0 ))) + ( (255-InData(int2( 19, 0 ))) << 8 ) + ( (255-InData( int2(21, 0 ))) << 16 ) + ( (255-InData(int2( 23, 0 ))) << 24 );
+						
+						uint sentr    =      InData(int2( 16, 1 ))  + (      InData(int2( 18, 1 ))  << 8 ) + (      InData( int2(20, 1 ))  << 16 ) + (      InData(int2( 22, 1 )) << 24 );
+						uint invsentr = (255-InData(int2( 17, 1 ))) + ( (255-InData(int2( 19, 1 ))) << 8 ) + ( (255-InData( int2(21, 1 ))) << 16 ) + ( (255-InData(int2( 23, 1 ))) << 24 );
+						//|| sentr != invsentr
+						return float4( dectime != invdectime , asuint(SelfData(int2(0,0)).y) != 370000001,  sentr != 0x5AAA0fff, 1 );
+						
+						//Can debug (virtualclock-dectime)/1000000.0
+					}
+					else if( selfCoord.y == 8 )
+					{
+						uint y, x;
+						uint j = 0;
+						if( InData( int2( 8, 8 ) ) > 200 )
+							return float4( 0.0, 1.0, 0.0, 1.0 );
+						if( InData( int2( 8, 8 ) ) < 10 )
+							return float4( 0.0, 0.0, 1.0, 1.0 );
+						for( y = 0; y < 16; y++ )
+						for( x = 0; x < 16; x++ )
+						{
+							if( InData(int2( x, y )) != j++ )
+							{
+								return float4( 1.0, 0.0, 0.0, 1.0 );
+							}
+						}
+						return 0.0;
+					}
 				}
 				
 				return 0.;

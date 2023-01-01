@@ -305,14 +305,16 @@ void SendPacketToSwadge()
 		}
 		LastSendPlayerPos++;
 		if(LastSendPlayerPos == MAX_VRC_PLAYERS ) LastSendPlayerPos = 0;
-		if( sendmod >= 2 ) break; // Set max # of players/models to send per frame.
+		if( sendmod >= 3 ) break; // Set max # of players/models to send per frame.
 	}
-	#if 0
+
 	for( i = 0; i < sizeof(modGuns) / sizeof(modGuns[0] ); i++ )
 	{
 		// Guns
 		network_model_t * g = modGuns[LastGunSendPos];
-		if( g->root[0] || g->root[1] || g->root[2] )
+		int has_pos = ( g->root[0] || g->root[1] || g->root[2] );
+		int has_dir = ( g->bones[0] || g->bones[1] || g->bones[2] );
+		if( has_pos && has_dir && g->radius )
 		{
 			*((uint32_t*)pack) = g->binencprop; pack += 4;
 			memcpy( pack, g->root, sizeof( g->root ) ); pack += sizeof( g->root );
@@ -322,11 +324,12 @@ void SendPacketToSwadge()
 			memcpy( pack, g->bones, 3 ); pack += 3;
 			sendmod++;
 		}
+
 		LastGunSendPos++;
 		if( LastGunSendPos == sizeof(modGuns) / sizeof(modGuns[0] ) ) LastGunSendPos = 0;
 		if( sendmod >= 4 ) break;
 	}
-	#endif
+
 	for( i = (MAX_RTMP_PLAYERS)*4; i < sizeof(gOboolets) / sizeof(gOboolets[0] ); i++ )
 	{
 		// Boolets
@@ -343,7 +346,7 @@ void SendPacketToSwadge()
 		
 		LastBooletSendPos++;
 		if( LastBooletSendPos == sizeof(gOboolets) / sizeof(gOboolets[0] ) ) LastBooletSendPos = (MAX_RTMP_PLAYERS)*4;
-		if( sendboo >= 5 ) break;
+		if( sendboo >= 3 ) break;
 	}
 					
 #if 0
@@ -648,7 +651,7 @@ int main( int argc, char ** argv )
 					{
 						boolet_t * b = gOboolets + bid;
 
-						b->timeOfLaunch = (uint32_t)(OGGetAbsoluteTime() * 1000000);
+						b->timeOfLaunch = (uint32_t)(OGGetAbsoluteTime() * 1000000) + 100000;
 
 						b->launchLocation[0] = -dataf[y][0][0] * 64;
 						b->launchLocation[1] = dataf[y][0][1] * 64;
@@ -698,15 +701,15 @@ int main( int argc, char ** argv )
 					network_model_t * g = modGuns[gid];				
 					g->timeOfUpdate = (uint32_t)(OGGetAbsoluteTime() * 1000000);
 
-					g->root[0] = dataf[y][0][0] * 64;
+					g->root[0] = -dataf[y][0][0] * 64;
 					g->root[1] = dataf[y][0][1] * 64;
 					g->root[2] = dataf[y][0][2] * 64;
 
-					g->bones[0] = ( dataf[y][1][0] - dataf[y][0][0] ) * 64;
-					g->bones[1] = ( dataf[y][1][1] - dataf[y][0][1] ) * 64;
-					g->bones[2] = ( dataf[y][1][2] - dataf[y][0][2] ) * 64;
+					g->bones[0] = ( dataf[y][1][0] )* 16;
+					g->bones[1] = -( dataf[y][1][1] ) * 16;
+					g->bones[2] = -( dataf[y][1][2] ) * 16;
 					
-					g->binencprop = (gid + MAX_VRC_PLAYERS) | ( 0<<8 ) | ( 0b11<<16 ); 
+					g->binencprop = (gid + MAX_VRC_PLAYERS) | ( 0<<8 ) | ( 0b11<<12 ); 
 					g->radius = 64;
 					g->reqColor = 180; // red
 					g->velocity[0] = 0;
