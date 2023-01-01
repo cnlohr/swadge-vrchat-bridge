@@ -651,7 +651,7 @@ int main( int argc, char ** argv )
 					{
 						boolet_t * b = gOboolets + bid;
 
-						b->timeOfLaunch = (uint32_t)(OGGetAbsoluteTime() * 1000000) + 100000;
+						b->timeOfLaunch = (uint32_t)(OGGetAbsoluteTime() * 1000000) + 80000; //Add 80ms Offset.
 
 						b->launchLocation[0] = -dataf[y][0][0] * 64;
 						b->launchLocation[1] = dataf[y][0][1] * 64;
