@@ -14,6 +14,9 @@
 #define sqrtf sqrt
 #include "rawdraw_sf.h"
 
+#define SWADGEDMX_IMPLEMENTATION
+#include "swadgedmx.h"
+
 #define CAPWIDTH 64
 #define DATAHEIGHT 608
 
@@ -442,7 +445,7 @@ void * SwadgeSender( void * v )
 	while( 1 )
 	{
 		OGLockMutex( HidMutex );
-		if( swadge )
+		if( swadge )	
 			SendPacketToSwadge();
 		OGUnlockMutex( HidMutex );
 		Sleep(1);
@@ -642,7 +645,9 @@ int main( int argc, char ** argv )
 				OGLockMutex( mutSendDataBank );
 				
 				// Player position.
-				for( y = 8; y < 248; y++ )
+				
+				// Boolets
+				for( y = 8; y < 184; y++ )
 				{
 					int bid = (y - 8)+(MAX_RTMP_PLAYERS)*4;
 					int enabled = dataf[y][2][0];
@@ -674,6 +679,36 @@ int main( int argc, char ** argv )
 					}
 				}
 				
+				{
+					uint8_t dmx512[512];
+					int max_lin_leds = 128;
+					int l;
+					for( l = 0; l < 128; l++ )
+					{
+						int lx = (l%2)+2;
+						int ly = l/2 + 184;
+						uint32_t bb = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
+						dmx512[l*3+0] = bb >> 16;
+						dmx512[l*3+1] = bb >> 8;
+						dmx512[l*3+2] = bb >> 0;
+					}
+					for( ; l < sizeof( dmx512 ) / 3; l++ )
+					{
+						int tid = l - 128;
+						int lx = (tid%2)+0;
+						int ly = tid/2 + 184;
+						uint32_t bb = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
+						dmx512[l*3+0] = bb >> 16;
+						dmx512[l*3+1] = bb >> 8;
+						dmx512[l*3+2] = bb >> 0;
+					}
+					
+					//static int frame;
+					//frame++;
+					//for( l = 0; l < 512; l++ ) dmx512[l] = frame;
+					SwadgeUpdateDMX( dmx512, sizeof( dmx512 ) );
+				}
+
 				for( y = 248; y < 584; y++ )
 				{
 					if( y < 248+10 )

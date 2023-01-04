@@ -5,6 +5,10 @@
 		_BananaTex ("Banana Texture", 2D) = "white" {}
 		_ShipTex ("Ship Texture", 2D) = "white" {}
 		_GeometryTex ("Data", 2D) = "white" {}
+		[HDR] _ColorAmbient ("Color Ambient", Color) = (0.1, 0.1, 0.1, 1)
+		_Norminess ("Skylight Norminess", float) = 1 
+		[HDR] _SkyLight ("Sky Light Contribution", Color) = (0.2, 0.2, 0.2, 1 )
+		[ToggleUI] _ForceDisplay ("Force Display", float ) = 0
 	}
 	SubShader
 	{
@@ -50,11 +54,16 @@
 			float3 uv : TEXCOORD0;
 			float3 normal : NORMAL;
 			float4 vertex : SV_POSITION;
+			float death : DEATH;
 			float4 debug : DEBUG;
 			UNITY_FOG_COORDS(1)
 		};
 
+		float4 _ColorAmbient;
 		sampler2D _ShipTex;
+		float _ForceDisplay;
+		float _Norminess;
+		float4 _SkyLight;
 		sampler2D _BananaTex;
 		Texture2D< float4 > _GeometryTex;
 
@@ -86,9 +95,9 @@
 			{
 				o.uv = input[i].uv;
 				float4 objectPlace = float4(input[i].vertex);
-				
-			
-				
+				float3 tnorm = input[i].normal;
+				o.death = 0;
+
 				if( isShip )
 				{
 					float3 deathprops = _GeometryTex[uint2( columnInGeoTex, 6 )];
@@ -102,6 +111,7 @@
 							float3 tricenter = ( input[0].vertex.xyz + input[1].vertex.xyz + input[2].vertex.xyz)/3;
 							objectPlace.xyz = lerp( objectPlace.xyz, tricenter, smoothstep(0, 1,float((deathprops.x-1.5)/3)) );
 						}
+						o.death = 1;
 						objectPlace.xyz += perdir * deathprops.x;
 					}
 				
@@ -120,8 +130,9 @@
 						cy*sz, sx*sy*sz+cx*cz, cx*sy*sz-sx*cz,
 						-sy, sx*cy, cx*cy );
 					
-					objectPlace.xyz = objectPlace.xzy * float3( 1, 1, -1 );
+					objectPlace.xyz = objectPlace.xzy * float3( 1, 1, -1 );  // WHY XZY HERE?  WHY COORDNIATE SHIFT?
 					objectPlace.xyz = mul( rmot, objectPlace.xyz );
+					tnorm.xyz = mul( rmot, tnorm.xzy  * float3( 1, 1, -1 ) );
 				}
 				else
 				{
@@ -135,15 +146,17 @@
 
 					objectPlace.xyz = objectPlace.xyz + 2.0 * cross(q.xyz, cross(q.xyz, objectPlace.xyz) + q.w *objectPlace.xyz);
 
+					tnorm.xyz = tnorm.xyz + 2.0 * cross(q.xyz, cross(q.xyz, tnorm.xyz) + q.w * tnorm.xyz);
+					tnorm = normalize(tnorm);
 					// If id == 0 it is a non-banana.
-					if( _GeometryTex[uint2( columnInGeoTex, 8+bananaNo)].z < 0.1 ||  _GeometryTex[uint2( columnInGeoTex, 8+bananaNo)].x < 0 ) return;
+					if( _GeometryTex[uint2( columnInGeoTex, 8+bananaNo)].z < 0.1 || _GeometryTex[uint2( columnInGeoTex, 8+bananaNo)].x < 0 ) return;
 				}
 				
 				float4 worldPlace = mul(unity_ObjectToWorld, objectPlace );
 
 				if( isShip )
 				{
-					if( length( _GeometryTex[uint2( columnInGeoTex, 1)].xyz ) == 0 ) return;
+					if( length( _GeometryTex[uint2( columnInGeoTex, 1)].xyz ) == 0 && _ForceDisplay < 0.5 ) return;
 					worldPlace.xyz += _GeometryTex[uint2( columnInGeoTex, 20)];
   					if( length( o.debug ) == 0 ) o.debug.r = -2;
 				}
@@ -160,7 +173,7 @@
 				o.vertex = mul(UNITY_MATRIX_VP, worldPlace);
 				UNITY_TRANSFER_FOG(o,o.vertex);
 				o.uv = input[i].uv;
-				o.normal = UnityObjectToWorldNormal(input[i].normal);
+				o.normal = UnityObjectToWorldNormal(tnorm);
 				
 				o._ShadowCoord = ComputeScreenPos(o.vertex);
 				#if UNITY_PASS_SHADOWCASTER
@@ -191,7 +204,12 @@
 				{
 					col = tex2D( _BananaTex, float3( i.uv.xy, 0.0 ) );
 				}
-				
+				if( i.death < 0.5 )
+				{
+					float3 lightContrib = min( max( 0, _Norminess + i.normal.y ), 3.0 );
+					
+					col.rgb *= lightContrib * _SkyLight + _ColorAmbient;
+				}
 				UNITY_APPLY_FOG(i.fogCoord, col);
 				return saturate(col);
 			}

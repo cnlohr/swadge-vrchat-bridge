@@ -79,9 +79,9 @@
 			float3 GunLocations[24];
 			float3 GunDirection[24];
 			
-			float3 BooletStartLocation[240];
-			float3 BooletStartDirection[240];
-			float3 BooletStartDataTime[240]; // [in_use 0 or 1, a counter making a unique value starting at 0 and counting to 65535 and resetting to zero.]
+			float3 BooletStartLocation[200];
+			float3 BooletStartDirection[200];
+			float3 BooletStartDataTime[200]; // [in_use 0 or 1, a counter making a unique value starting at 0 and counting to 65535 and resetting to zero.]
 
 			float3 SkeletonData[12*84];
 			float3 GenProps;
@@ -163,7 +163,7 @@
 				{
 					uint2 compcoord = uint2( sp.x / 4, sp.y );
 					// Starting at y = 8
-					if( sp.y < 248 )
+					if( sp.y < 184 )
 					{
 						// (240 boolets)
 						// * Up to 256 boolets.
@@ -178,6 +178,41 @@
 							testvar = BooletStartDataTime[sp.y-8];
 						else
 							return float4( 0.1, 0.0, 0.0, 1.0 );
+					}
+					else if( sp.y < 248 )
+					{
+						// 184..248 = color data?
+						// 64 px high
+						int ypx = sp.y - 184;
+						if( sp.x < 2 )
+						{
+							return AudioLinkData( ALPASS_CCLIGHTS + uint2( ypx*2+sp.x, 0 ) );
+						}
+						else if( sp.x < 4 )
+						{
+							int xpx = sp.x - 2;
+							return AudioLinkData( ALPASS_CCSTRIP + uint2( ypx*2+xpx, 0 ) );
+						}
+						else if( sp.x < 8 )
+						{
+							// Classic AudioLink
+							int xpx = sp.x%2;
+							int bandS = (sp.x/2)*2;
+							return float4(
+								AudioLinkData( ALPASS_AUDIOLINK + uint2( ypx*2+xpx, bandS ) ).r,
+								AudioLinkData( ALPASS_AUDIOLINK + uint2( ypx*2+xpx, bandS+1 ) ).r,
+								0.0, 1.0 );
+						}
+						else if( sp.x < 10 )
+						{
+							int xpx = sp.x%2;
+							// Autocorrelator.
+							return AudioLinkData( ALPASS_AUTOCORRELATOR + uint2( ypx*2+xpx, 0 ) );
+						}
+						else
+						{
+							return 0;
+						}
 					}
 					else if( sp.y < 584 ) // 84*4+248
 					{

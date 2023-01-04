@@ -63,7 +63,7 @@ public class MakeGeometry : MonoBehaviour
 		mesh.vertices = vertices;
 		mesh.normals = normals;
 		mesh.SetUVs( 0, uvs );
-		mesh.bounds = new Bounds(new Vector3(0,0,0), new Vector3(1e4f, 1e4f, 1e4f));
+		mesh.bounds = new Bounds(new Vector3(0,28,15), new Vector3(40*2, 40*2, 60*2));
 		mesh.SetIndices(indices, MeshTopology.Triangles, 0, false, 0);
 		AssetDatabase.CreateAsset(mesh, "Assets/SwadgeIntegration/Geometrizer/SwadgeGeometry.asset");
 	}
