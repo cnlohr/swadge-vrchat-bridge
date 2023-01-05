@@ -112,6 +112,7 @@ int main()
 	// Parse through sandbox_symbols.txt and find the sandbox, itself.
 	uint32_t sandbox_main_address = 0;
 	uint32_t sandbox_mode_address = 0;
+	uint32_t data_segment_origin = 0;
 	uint32_t sandbox_start_address_inst = 0;
 	uint32_t sandbox_start_address_data = 0;
 	uint32_t sandbox_sentinel_end_data = 0;
@@ -137,6 +138,10 @@ int main()
 			{
 				sandbox_main_address = strtol( addy, 0, 16 );
 				printf( "Found sandbox_main at 0x%08x\n", sandbox_main_address );
+			}
+			if( strcmp( size, "sandbox_sentinel_origin_data" ) == 0 )
+			{
+				data_segment_origin = strtol( addy, 0, 16 );;
 			}
 			if( strcmp( name, "sandbox_mode" ) == 0 && l == 6 )
 			{
@@ -191,9 +196,27 @@ int main()
 	} while ( r < 6 );
 	tries = 0;
 
+
+	// In case we are using this solely as an upload and are not building.
+	int total_segment_size = sandbox_sentinel_end_data - data_segment_origin + sandbox_bss_size;
+	rdata[0] = 170;
+	rdata[1] = 8;
+	rdata[2] = total_segment_size;
+	rdata[3] = total_segment_size>>8;
+	rdata[4] = total_segment_size>>16;
+	rdata[5] = total_segment_size>>24;
+	do
+	{
+		r = hid_send_feature_report( hd, rdata, 65 );
+		if( tries++ > 10 ) { fprintf( stderr, "Error sending feature report on command %d (%d)\n", rdata[1], r ); return -85; }
+	} while ( r != 65 );
+	tries = 0;
+	printf( "Allocation size to %d\n", total_segment_size );
+
+
 	// Give it a chance to exit.
 #if defined( WINDOWS ) || defined( WIN32 ) || defined( WIN64 ) 
-	usleep( 50 );
+	Sleep( 50 );
 #else
 	usleep( 50000 );
 #endif

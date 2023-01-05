@@ -17,8 +17,8 @@ endif
 #SWADGE_ROOT:=C:/projects/Super-2023-Swadge-FW
 SWADGE_ROOT:=~/git/Super-2023-Swadge-FW
 
-#SYSELF:=$(SWADGE_ROOT)/build/swadge-esp32.elf
-SYSELF:=../flashelf/swadge-esp32.elf
+SYSELF:=$(SWADGE_ROOT)/build/swadge-esp32.elf
+#SYSELF:=../flashelf/swadge-esp32.elf
 
 CFLAGS+=-I../lib
 
@@ -31,7 +31,9 @@ sandbox.o : buildhelp sandbox.c $(SYSELF) build
 	xtensa-esp32s2-elf-objdump -t build/sandbox.o > build/debug_sandbox_t.txt
 	xtensa-esp32s2-elf-objdump -S build/sandbox.o > build/debug_sandbox_S.txt
 
-run : sandbox_upload sandbox.o
+build/sandbox_data.bin : sandbox.o
+
+run : sandbox_upload build/sandbox_data.bin build/sandbox_inst.bin
 	SWADGE_ROOT=$(SWADGE_ROOT) ./sandbox_upload
 
 buildhelp : buildhelp.c
