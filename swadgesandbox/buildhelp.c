@@ -46,7 +46,7 @@ int main( int argc, char ** argv )
 	const char * swadgepath = getenv( "SWADGE_ROOT" );
 
 	hid_init();
-	hid_device * hd = hid_open( VID, PID, 0);
+	hid_device * hd = hid_open( VID, PID, L"420690" );
 
 	if( !hd )
 	{

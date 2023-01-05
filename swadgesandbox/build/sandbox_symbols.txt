@@ -18,7 +18,7 @@ SYMBOL TABLE:
 00000000 l    d  .xt.lit	00000000 .xt.lit
 00000000 l    d  .xt.prop	00000000 .xt.prop
 00000000 l    df *ABS*	00000000 sandbox.c
-00000000 l    df *ABS*	00000000 /tmp/cc8ogFpy.o
+00000000 l    df *ABS*	00000000 /tmp/ccB8ARwq.o
 4005b690 l       .inst	00000000 _advanced_usb_printf_head
 4005b694 l       .inst	00000000 _GPIO_IN_REG
 4005b6b0 g       .inst	00000000 asm_read_gpio

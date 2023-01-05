@@ -106,7 +106,7 @@ int DoUpload( const char * file, uint32_t address )
 int main()
 {
 	hid_init();
-	hd = hid_open( VID, PID, 0);
+	hd = hid_open( VID, PID, L"420690" );
 	if( !hd ) { fprintf( stderr, "Could not open USB\n" ); return -94; }
 
 	// Parse through sandbox_symbols.txt and find the sandbox, itself.
