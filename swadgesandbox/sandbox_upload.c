@@ -196,6 +196,12 @@ int main()
 	} while ( r < 6 );
 	tries = 0;
 
+	// Give it a chance to exit.
+#if defined( WINDOWS ) || defined( WIN32 ) || defined( WIN64 ) 
+	Sleep( 150 );
+#else
+	usleep( 150000 );
+#endif
 
 	// In case we are using this solely as an upload and are not building.
 	int total_segment_size = sandbox_sentinel_end_data - data_segment_origin + sandbox_bss_size;
@@ -213,8 +219,6 @@ int main()
 	tries = 0;
 	printf( "Allocation size to %d\n", total_segment_size );
 
-
-	// Give it a chance to exit.
 #if defined( WINDOWS ) || defined( WIN32 ) || defined( WIN64 ) 
 	Sleep( 50 );
 #else
