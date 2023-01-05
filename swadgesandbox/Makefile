@@ -12,6 +12,8 @@ CC:=tcc
 LDFLAGS:=C:/windows/system32/setupapi.dll
 endif
 
+# Do a dance with these to get the files you need.
+
 #SWADGE_ROOT:=C:/projects/Super-2023-Swadge-FW
 SWADGE_ROOT:=~/git/Super-2023-Swadge-FW
 
