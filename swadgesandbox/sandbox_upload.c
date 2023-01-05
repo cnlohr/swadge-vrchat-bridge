@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdint.h>
+#if defined( WINDOWS ) || defined( WIN32 ) || defined( WIN64 ) 
 #include <unistd.h>
+#else
+#endif
 #include <sys/stat.h>
 
 #include "hidapi.h"
@@ -189,7 +192,11 @@ int main()
 	tries = 0;
 
 	// Give it a chance to exit.
+#if defined( WINDOWS ) || defined( WIN32 ) || defined( WIN64 ) 
+	usleep( 50 );
+#else
 	usleep( 50000 );
+#endif
 
 	r = DoUpload( "build/sandbox_inst.bin", sandbox_start_address_inst );
 	if( r ) return r;

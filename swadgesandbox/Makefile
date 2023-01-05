@@ -8,14 +8,15 @@ LDFLAGS:=-ludev
 CC:=gcc
 else
 CFLAGS:=-Os -s
-CC:=gcc
+CC:=tcc
 LDFLAGS:=C:/windows/system32/setupapi.dll
 endif
 
-SWADGE_ROOT:=C:/projects/Super-2023-Swadge-FW
+#SWADGE_ROOT:=C:/projects/Super-2023-Swadge-FW
+SWADGE_ROOT:=~/git/Super-2023-Swadge-FW
 
-#SYSELF:=$(SWADGE_ROOT)/build/swadge-esp32.elf
-SYSELF:=../flashelf/swadge-esp32.elf
+SYSELF:=$(SWADGE_ROOT)/build/swadge-esp32.elf
+#SYSELF:=../flashelf/swadge-esp32.elf
 
 CFLAGS+=-I../lib
 
