@@ -35,13 +35,15 @@ hid_device * swadgehost_setup();
 
 #include <time.h>
 
+#ifndef SWADGE_VID
 #define SWADGE_VID 0x303a
 #define SWADGE_PID 0x4004
+#endif
 
-
+#ifndef HIDAPI_H__
 #include "../lib/hidapi.h"
 #include "../lib/hidapi.c"
-
+#endif
 
 
 #ifdef WIN32
@@ -60,7 +62,7 @@ hid_device * swadgehost_setup()
 {
 	hid_device * hd;
 	hid_init();
-	return hid_open( SWADGE_VID, SWADGE_PID, 0 );
+	return hid_open( SWADGE_VID, SWADGE_PID, L"420690" );
 }
 	
 #endif

@@ -14,6 +14,9 @@
 #define sqrtf sqrt
 #include "rawdraw_sf.h"
 
+#define SWADGEDMX_IMPLEMENTATION
+#include "swadgedmx.h"
+
 #define CAPWIDTH 64
 #define DATAHEIGHT 608
 
@@ -24,9 +27,54 @@
 #include "packagingfunctions.h"
 
 
+int demomode = 1;
 swadge_t * swadge;
 
+typedef struct  // 32 bytes.
+{
+    uint32_t timeOffsetOfPeerFromNow;
+    uint32_t timeOfUpdate;  // In our timestamp
+    uint8_t  mac[6];
 
+    // Not valid for server.
+    int16_t posAt[3];
+    int8_t  velAt[3];
+    int8_t  rotAt[3];    // Right now, only HPR where R = 0
+    uint8_t  basePeerFlags; // If zero, don't render.  Note flags&1 has reserved meaning locally for presence..  if flags & 2, render as dead.
+    uint16_t  auxPeerFlags; // If dead, is ID of boolet which killed "me"
+    uint8_t  framesDead;
+    uint8_t  reqColor;
+} multiplayerpeer_t;
+
+typedef struct  // Rounds up to 16 bytes.
+{
+    uint32_t timeOfLaunch; // In our timestamp.
+    int16_t launchLocation[3];
+    int16_t launchRotation[2]; // Pitch and Yaw
+    uint16_t flags;  // If 0, disabled.  Otherwise, is a randomized ID.
+} boolet_t;
+
+typedef struct
+{
+    uint32_t timeOfUpdate;
+    uint32_t binencprop;      //Encoding starts at lsb.  First: # of bones, then the way the bones are interconnected.
+    int16_t root[3];
+    uint8_t  radius;
+    uint8_t  reqColor;
+    int8_t  velocity[3];
+    int8_t  bones[0*3];  //Does not need to be all that long.
+} network_model_t;
+
+og_mutex_t HidMutex;
+
+#define MAX_RTMP_PLAYERS 90
+multiplayerpeer_t gOplayers[(MAX_RTMP_PLAYERS)];
+boolet_t gOboolets[(MAX_RTMP_PLAYERS)*4+240];
+og_mutex_t rtmpOutLock;
+void * RTMPTransmitThread( void * v );
+void * SwadgeReceiver( void * v );
+
+#include "bridgeapp_rtmp.c"
 
 HWND wnd = 0;
 HDC screen;
@@ -39,18 +87,24 @@ int offset_x, offset_y;
 miniosc * osc;
 float fSendTimeMS;
 
-void HandleKey( int keycode, int bDown ){}
+void HandleKey( int keycode, int bDown ){ if( keycode == ' ' && bDown ) akey = !akey; }
 void HandleButton( int x, int y, int button, int bDown ) { }
 void HandleMotion( int x, int y, int mask ) { }
 void HandleDestroy() { }
 const char * mycasestr( const char * haystack, const char * needle );
 BOOL CALLBACK EnumWindowsProc( HWND hwnd, LONG lParam );
+int is_real_vrchat_window;
 
 #define MAX_VRC_PLAYERS 84
 
 og_mutex_t mutSendDataBank;
 float BonePositions[MAX_VRC_PLAYERS][12][3];
+#define MAX_GUNS 24
+network_model_t * modGuns[MAX_GUNS];
 int   LastSendPlayerPos;
+int   LastGunSendPos;
+int   LastBooletSendPos;
+
 
 int IsVec3Zero( float * vec )
 {
@@ -68,7 +122,7 @@ void SendPacketToSwadge()
 	int i, j;
 	uint8_t buff[512];
 	uint8_t * pack = buff;
-	uint32_t now = (uint32_t)(OGGetAbsoluteTime() * 1000);
+	uint32_t now = (uint32_t)(OGGetAbsoluteTime() * 1000000);
 	int seed = now;
 
 	*((uint32_t*)pack) = FSNET_CODE_SERVER;  pack += 4;
@@ -86,7 +140,7 @@ void SendPacketToSwadge()
 	static int send_no;
 	send_no++;
 	
-	for( i = 0; i < 15; i++ )
+	for( i = 0; i < 84; i++ )
 	{
 //og_mutex_t mutSendDataBank;
 //float BonePositions[84][12][3];
@@ -137,6 +191,7 @@ void SendPacketToSwadge()
 				codeword |= 0 << (sbl++);  // ---> Go back to Neck
 				codeword |= 1 << (sbl++); // To Right-Forearm
 				codeword |= 1 << (sbl++); // To Right-Hand
+				//?? Extra 1?
 				codeword |= 0 << (sbl++);  // 0 is yes, reset back to zero.
 				codeword |= 0 << (sbl++);  // ---> Go back to Neck
 				codeword |= 1 << (sbl++); // To Head
@@ -148,7 +203,8 @@ void SendPacketToSwadge()
 				codeword |= 1 << (sbl++); // Go to right foot.
 				*/
 				// Above generates the following:
-				codeword |= 0b1110011001011011<<sbl; sbl+=16;
+				codeword |= 0b1011001100110111<<sbl; sbl+=16;
+					//0b1100110011100111<<sbl; sbl+=16;  //WORKS, right leg
 			}
 			else
 			{
@@ -156,18 +212,34 @@ void SendPacketToSwadge()
 				codeword |= 1 << (sbl++);
 			}
 			
+			
+			/*
+				BoneData[place++] = p.GetPosition();                                    0
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.Head);             1
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.Neck);             2
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.LeftLowerLeg);     3
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.RightLowerLeg);    4
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.LeftFoot);         5
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.RightFoot);        6
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.LeftLowerArm);     7
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.RightLowerArm);    8
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.LeftHand);         9
+				BoneData[place++] = p.GetBonePosition(HumanBodyBones.RightHand);       10
+				BoneData[place++] = p.GetVelocity();
+			*/
+			
 			*((uint32_t*)pack) = codeword; pack += 4;
 
 			int16_t loc[3];
 			int ang = ((now >> 19)+i*30) % 360;
-			loc[0] = BonePositions[LastSendPlayerPos][0][0] * 64;
+			loc[0] = -BonePositions[LastSendPlayerPos][0][0] * 64; // XXX UNIVERSE FLIP
 			loc[1] = BonePositions[LastSendPlayerPos][0][1] * 64;
 			loc[2] = BonePositions[LastSendPlayerPos][0][2] * 64;
 			memcpy( pack, loc, sizeof( loc ) ); pack += sizeof( loc );
 			*(pack++) = 255; // radius
 			*(pack++) = 35; // req color
 			int8_t vel[3];
-			vel[0] = BonePositions[LastSendPlayerPos][11][0] * 4;
+			vel[0] = -BonePositions[LastSendPlayerPos][11][0] * 4; // XXX UNIVERSE FLIP
 			vel[1] = BonePositions[LastSendPlayerPos][11][1] * 4;
 			vel[2] = BonePositions[LastSendPlayerPos][11][2] * 4;
 			memcpy( pack, vel, sizeof( vel ) ); pack += sizeof( vel );
@@ -177,23 +249,48 @@ void SendPacketToSwadge()
 
 			if( hasSkeleton )
 			{
-				const int boneAssignments[12] = { -2, 7, 9, -2, 8, 10, -2, 1, -3, 5, -4, 6 };
-				for( j = 0; j < nrbones; j++ )
+				const int boneAssignments[14] = { 2, 7, 9, 2, 8, 10, -999, 3, 5, -999, 4, 6, 2, 1 };
+				for( j = 0; j < sizeof(boneAssignments)/sizeof(boneAssignments[0]); j++ )
 				{
 					int emitBone = boneAssignments[j];
+					int16_t newp[3];
 					if( emitBone < 0 )
 					{
 						emitBone *= -1;
-						memcpy( cursor, loc, sizeof( cursor ) );
+						if( emitBone == 999 )
+						{
+							memcpy( cursor, loc, sizeof( cursor ) );
+							continue;							
+						}
+						else
+						{
+							newp[0] = -BonePositions[LastSendPlayerPos][emitBone][0] * 64; // XXX UNIVERSE FLIP
+							newp[1] = BonePositions[LastSendPlayerPos][emitBone][1] * 64;
+							newp[2] = BonePositions[LastSendPlayerPos][emitBone][2] * 64;
+
+							newp[0] = newp[0];
+							newp[1] = newp[1];
+							newp[2] = newp[2];
+						}
 					}
-					
-					int16_t newp[3];
-					newp[0] = BonePositions[LastSendPlayerPos][emitBone][0] * 64;
-					newp[1] = BonePositions[LastSendPlayerPos][emitBone][1] * 64;
-					newp[2] = BonePositions[LastSendPlayerPos][emitBone][2] * 64;
+					else
+					{
+						newp[0] = -BonePositions[LastSendPlayerPos][emitBone][0] * 64; // XXX UNIVERSE FLIP
+						newp[1] = BonePositions[LastSendPlayerPos][emitBone][1] * 64;
+						newp[2] = BonePositions[LastSendPlayerPos][emitBone][2] * 64;
+					}
+
 					((int8_t*)pack)[0] = newp[0] - cursor[0];
 					((int8_t*)pack)[1] = newp[1] - cursor[1];
 					((int8_t*)pack)[2] = newp[2] - cursor[2];
+					
+					if( emitBone == 1 )
+					{
+						//TRICKY: Make heads look bigger.  Otherwise it looks jankey.
+						((int8_t*)pack)[0] *= 2;
+						((int8_t*)pack)[1] *= 2;
+						((int8_t*)pack)[2] *= 2;
+					}
 					cursor[0] = newp[0];
 					cursor[1] = newp[1];
 					cursor[2] = newp[2];
@@ -211,10 +308,78 @@ void SendPacketToSwadge()
 		}
 		LastSendPlayerPos++;
 		if(LastSendPlayerPos == MAX_VRC_PLAYERS ) LastSendPlayerPos = 0;
-		if( sendmod == 3 ) break; // Set max # of players/models to send per frame.
+		if( sendmod >= 3 ) break; // Set max # of players/models to send per frame.
 	}
 
-	for( i = 0; i < 0; i++ )
+	for( i = 0; i < sizeof(modGuns) / sizeof(modGuns[0] ); i++ )
+	{
+		// Guns
+		network_model_t * g = modGuns[LastGunSendPos];
+		int has_pos = ( g->root[0] || g->root[1] || g->root[2] );
+		int has_dir = ( g->bones[0] || g->bones[1] || g->bones[2] );
+		if( has_pos && has_dir && g->radius )
+		{
+			*((uint32_t*)pack) = g->binencprop; pack += 4;
+			memcpy( pack, g->root, sizeof( g->root ) ); pack += sizeof( g->root );
+			*(pack++) = g->radius;
+			*(pack++) = g->reqColor;
+			memcpy( pack, g->velocity, sizeof( g->velocity ) ); pack += sizeof( g->velocity );
+			memcpy( pack, g->bones, 3 ); pack += 3;
+			sendmod++;
+		}
+
+		LastGunSendPos++;
+		if( LastGunSendPos == sizeof(modGuns) / sizeof(modGuns[0] ) ) LastGunSendPos = 0;
+		if( sendmod >= 4 ) break;
+	}
+
+	for( i = (MAX_RTMP_PLAYERS)*4; i < sizeof(gOboolets) / sizeof(gOboolets[0] ); i++ )
+	{
+		// Boolets
+		boolet_t * b = gOboolets + LastBooletSendPos;
+		if( b->flags )
+		{
+			sendboo++;
+			*(pack++) = LastBooletSendPos-(MAX_RTMP_PLAYERS)*4; // Local "bulletID"
+			memcpy( pack, &b->timeOfLaunch, sizeof( b->timeOfLaunch ) ); pack += sizeof( b->timeOfLaunch );
+			memcpy( pack, b->launchLocation, sizeof( b->launchLocation) ); pack += sizeof( b->launchLocation );
+			memcpy( pack, b->launchRotation, sizeof( b->launchRotation) ); pack += sizeof( b->launchRotation );
+			memcpy( pack, &b->flags, sizeof(b->flags) ); pack += sizeof( b->flags );
+		}
+		
+		LastBooletSendPos++;
+		if( LastBooletSendPos == sizeof(gOboolets) / sizeof(gOboolets[0] ) ) LastBooletSendPos = (MAX_RTMP_PLAYERS)*4;
+		if( sendboo >= 3 ) break;
+	}
+					
+#if 0
+	// Now, need to send boolets.
+	for( i = 0; i < 5; i++ )
+	{
+		sendboo++;
+		
+		int16_t loc[3];
+		int16_t rot[2] = { 0 };
+		rot[1] = 1000;
+		uint16_t bid = i+1 +send_no;
+
+		int ang = (i*30+(now >> 12)) % 360;
+		loc[0] = i;//getSin1024( ang )>>3;
+		loc[1] = 500;
+		loc[2] = 0;//getCos1024( ang )>>3;
+
+		*(pack++) = i+send_no; // Local "bulletID"
+		memcpy( pack, &now, sizeof(now) ); pack += sizeof( now );
+		memcpy( pack, loc, sizeof(loc) ); pack += sizeof( loc );
+		memcpy( pack, rot, sizeof(rot) ); pack += sizeof( rot );
+		memcpy( pack, &bid, sizeof(bid) ); pack += sizeof( bid );
+	}
+#endif
+
+
+#if 0
+	// DEMO SHIPS
+	for( i = 0; i < 3; i++ )
 	{
 		sendshp++;
 		
@@ -239,31 +404,12 @@ void SendPacketToSwadge()
 		memcpy( pack, &flags, sizeof( flags ) ); pack += sizeof( flags );
 		memcpy( pack, &kbb, sizeof( kbb ) ); pack += sizeof( kbb );
 		*(pack++) = (i+send_no+iter*10)%216; // req color
-
 	}
-	// Now, need to send boolets.
-	for( i = 0; i < 0; i++ )
-	{
-		sendboo++;
-		
-		int16_t loc[3];
-		int16_t rot[2] = { 0 };
-		rot[1] = 1000;
-		uint16_t bid = i+1 +send_no;
-
-		int ang = (i*30+(now >> 12)) % 360;
-		loc[0] = i;//getSin1024( ang )>>3;
-		loc[1] = 500;
-		loc[2] = 0;//getCos1024( ang )>>3;
-
-		*(pack++) = i+send_no; // Local "bulletID"
-		memcpy( pack, &now, sizeof(now) ); pack += sizeof( now );
-		memcpy( pack, loc, sizeof(loc) ); pack += sizeof( loc );
-		memcpy( pack, rot, sizeof(rot) ); pack += sizeof( rot );
-		memcpy( pack, &bid, sizeof(bid) ); pack += sizeof( bid );
-	}
-
+	#endif
+	
+	
 	OGUnlockMutex( mutSendDataBank );
+	printf( "PL: %d %d\n", pack - buff, now );
 
 	
 	uint32_t assetCounts = 0;
@@ -273,6 +419,7 @@ void SendPacketToSwadge()
 	acbits += WriteUEQ( &assetCounts, sendmod ); //models
 	acbits += WriteUEQ( &assetCounts, sendshp ); // ships
 	acbits += WriteUEQ( &assetCounts, sendboo ); // boolets
+	acbits += WriteUQ( &assetCounts, 1, 1 );
 	FinalizeUEQ( &assetCounts, acbits );
 	*assetCountsPlace = assetCounts;
 
@@ -292,48 +439,15 @@ void SendPacketToSwadge()
 	}
 }
 
-og_mutex_t HidMutex;
 
 void * SwadgeSender( void * v )
 {
 	while( 1 )
 	{
 		OGLockMutex( HidMutex );
-		if( swadge )
+		if( swadge )	
 			SendPacketToSwadge();
 		OGUnlockMutex( HidMutex );
-		Sleep(1);
-	}
-}
-
-void * SwadgeReceiver( void * v )
-{
-	while( 1 )
-	{
-		uint8_t data[257];
-		do
-		{
-			data[0] = 173;
-			int r;
-			if( swadge )
-				r = hid_get_feature_report( swadge, data, 257 );
-			else
-				r = -9;
-
-			if( r < 0 ) {
-				printf( "00Setu %d %d\n", r, HidMutex );
-				OGLockMutex(HidMutex);
-				printf( "10Setu %d\n", r );
-				if( swadge ) hid_close( swadge );
-				printf( "Setu\n" );
-				swadge = swadgehost_setup();
-				printf( "SC: %d\n", swadge );
-				OGUnlockMutex( HidMutex );
-			}
-			if( r < 7 ) break;
-			//
-		} while( 1 );
-
 		Sleep(1);
 	}
 }
@@ -349,7 +463,16 @@ int main( int argc, char ** argv )
 {
 	char cts[256];
 	
+	int i;
+	for( i = 0; i < MAX_GUNS; i++ )
+	{
+		modGuns[i] = malloc( sizeof( network_model_t ) + 3 );
+	}
+
+	
 	osc = minioscInit( 0, 9993, "127.0.0.1", 0 );
+
+	OGCreateThread( RTMPTransmitThread, 0 );
 
 	CNFGSetup( argv[0], 480, 790);
 	SwadgeSetup();
@@ -409,10 +532,7 @@ int main( int argc, char ** argv )
 				Sleep(1);
 				continue;
 			}
-			
-			
-			//printf( "%08x %08x %08x\n", bmpBuffer[(height-1)*width+0], bmpBuffer[(height-1)*width+1],
-			//	bmpBuffer[(height-1)*width+2], bmpBuffer[(height-1)*width+3] );
+
 			if( r != height )
 			{
 				printf( "R/H: %d %d\n", r, height );
@@ -516,16 +636,79 @@ int main( int argc, char ** argv )
 				sprintf( cts, "%f %f %f\n", dataf[y][0][0], dataf[y][0][1], dataf[y][0][2] );
 				CNFGDrawText( cts, 2 );
 			}
-			
+
 			DeltaGameTime = dataf[4][0][1] - LastGameTime;
 			LastGameTime = dataf[4][0][1];
-
 
 			if( DeltaGameTime > 0 )
 			{
 				OGLockMutex( mutSendDataBank );
 				
 				// Player position.
+				
+				// Boolets
+				for( y = 8; y < 184; y++ )
+				{
+					int bid = (y - 8)+(MAX_RTMP_PLAYERS)*4;
+					int enabled = dataf[y][2][0];
+					int id = dataf[y][2][1];
+					if( gOboolets[bid].flags != id )
+					{
+						boolet_t * b = gOboolets + bid;
+
+						b->timeOfLaunch = (uint32_t)(OGGetAbsoluteTime() * 1000000) + 80000; //Add 80ms Offset.
+
+						b->launchLocation[0] = -dataf[y][0][0] * 64;
+						b->launchLocation[1] = dataf[y][0][1] * 64;
+						b->launchLocation[2] = dataf[y][0][2] * 64;
+						
+						// Figure out the pitch/yaw of the shot.
+						float dX = -dataf[y][1][0];
+						float dY = dataf[y][1][1];
+						float dZ = dataf[y][1][2];
+
+						float tau = atan2( dX, dZ );
+						float mR  = sqrt( dX * dX + dZ * dZ );
+						float gam = -atan2( dY, mR );
+						
+						b->launchRotation[0] = tau * 3920 / 6.2831852;
+						b->launchRotation[1] = gam * 3920 / 6.2831852;
+						b->flags = id;
+						
+						printf( "Launch Boolet! %f %f %f %f / %d %d %d / %d\n", dX, dY, dZ, mR, y, bid, id, b->timeOfLaunch );
+					}
+				}
+				
+				{
+					uint8_t dmx512[512];
+					int max_lin_leds = 128;
+					int l;
+					for( l = 0; l < 128; l++ )
+					{
+						int lx = (l%2)+2;
+						int ly = l/2 + 184;
+						uint32_t bb = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
+						dmx512[l*3+0] = bb >> 16;
+						dmx512[l*3+1] = bb >> 8;
+						dmx512[l*3+2] = bb >> 0;
+					}
+					for( ; l < sizeof( dmx512 ) / 3; l++ )
+					{
+						int tid = l - 128;
+						int lx = (tid%2)+0;
+						int ly = tid/2 + 184;
+						uint32_t bb = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
+						dmx512[l*3+0] = bb >> 16;
+						dmx512[l*3+1] = bb >> 8;
+						dmx512[l*3+2] = bb >> 0;
+					}
+					
+					//static int frame;
+					//frame++;
+					//for( l = 0; l < 512; l++ ) dmx512[l] = frame;
+					SwadgeUpdateDMX( dmx512, sizeof( dmx512 ) );
+				}
+
 				for( y = 248; y < 584; y++ )
 				{
 					if( y < 248+10 )
@@ -545,9 +728,30 @@ int main( int argc, char ** argv )
 						BonePositions[playerid][fieldno][1] = dataf[y][field][1];
 						BonePositions[playerid][fieldno][2] = dataf[y][field][2];
 					}
-					
-					
 				}
+
+				for( y = 584; y < 608; y++ )
+				{
+					int gid = y - 584;
+					network_model_t * g = modGuns[gid];				
+					g->timeOfUpdate = (uint32_t)(OGGetAbsoluteTime() * 1000000);
+
+					g->root[0] = -dataf[y][0][0] * 64;
+					g->root[1] = dataf[y][0][1] * 64;
+					g->root[2] = dataf[y][0][2] * 64;
+
+					g->bones[0] = ( dataf[y][1][0] )* 16;
+					g->bones[1] = -( dataf[y][1][1] ) * 16;
+					g->bones[2] = -( dataf[y][1][2] ) * 16;
+					
+					g->binencprop = (gid + MAX_VRC_PLAYERS) | ( 0<<8 ) | ( 0b11<<12 ); 
+					g->radius = 64;
+					g->reqColor = 180; // red
+					g->velocity[0] = 0;
+					g->velocity[1] = 0;
+					g->velocity[2] = 0;
+				}
+
 				
 				OGUnlockMutex( mutSendDataBank );
 			}
@@ -615,6 +819,7 @@ int main( int argc, char ** argv )
 		else
 		{
 			// Keep searching
+			is_real_vrchat_window = 0;
 			EnumWindows( (WNDENUMPROC)EnumWindowsProc, (LPARAM)0 );
 			CNFGPenX = 65; CNFGPenY = 0;
 			CNFGDrawText( "Searching for VRChat", 2 );
@@ -680,11 +885,20 @@ BOOL CALLBACK EnumWindowsProc( HWND hwnd, LONG lParam )
 
 	if( rect.right - rect.left == 0 && rect.bottom - rect.top == 0 ) return TRUE;
 
-	if( rect.right > 200 && rect.right < 400 && rect.bottom > 200 && rect.bottom < 400 )
-		printf( ":%s:%s: %d %d\n", windowname, windowname, rect.right, rect.bottom );
+//	if( rect.right > 200 && rect.bottom > 200 )
+//		printf( ":%s:%s: %d %d\n", windowname, windowname, rect.right, rect.bottom );
+
+	if( mycasestr( windowexe, "VRChat" ) && rect.right > 10 && rect.bottom > 10 && 
+		strcmp( windowname, "VRChat" ) == 0 )
+	{
+		printf( "%s / %s / %d %d\n", windowname, windowexe, rect.right, rect.bottom );
+		printf( "********\n" );
+		is_real_vrchat_window = 1;
+		wnd = hwnd;
+	}
 
 	if( mycasestr( windowexe, "editor\\unity" ) && rect.right > 10 && rect.bottom > 10 && 
-		mycasestr( windowname, "PC, Mac & Linux Standalone" ) )
+		mycasestr( windowname, "PC, Mac & Linux Standalone" ) && !is_real_vrchat_window )
 	{
 		printf( "%s / %s / %d %d\n", windowname, windowexe, rect.right, rect.bottom );
 		printf( "********\n" );
@@ -719,96 +933,3 @@ const char * mycasestr( const char * haystack, const char * needle )
 	}
 	return 0;
 }
-
-
-#if 0
-
-
-
-void setup()
-{
-	EnumWindows(EnumWindowsProc, (LPARAM)0);
-	screen = GetDC(wnd);
-	target = CreateCompatibleDC(screen);
-    SetStretchBltMode(target, COLORONCOLOR);
-	printf( "WND: %d\nDC: %08x\nTARGET: %08x\n", wnd, screen, target );
-	if( wnd == 0 ) exit( - 1 );
-	width = 192;//GetSystemMetrics(SM_CXSCREEN);
-	height = 108;//GetSystemMetrics(SM_CYSCREEN);
-	bmp = CreateCompatibleBitmap(screen, width, height);
-	//DeleteObject( bmp );
-}
-uint32_t * bmpBuffer = 0;
-
-int main()
-{
-	COLORREF color=0xaaaaaaaa;
-	mutSendDataBank = OGCreateMutex();
-	
-	setup();
-	double st = OGGetAbsoluteTime();
-	
-	double delt = OGGetAbsoluteTime() - st;
-	printf( "Timing 1: %f\n", delt );
-	st = OGGetAbsoluteTime();
-	//for( iter = 0; iter < 10; iter++ )
-	while(1)
-	{
-		SelectObject(target, bmp);
-		BitBlt(target, 0, 0, width, height, screen, 0, 0, SRCCOPY | CAPTUREBLT);
-		PrintWindow( wnd, target, /*PW_RENDERFULLCONTENT */2 );
-
-		BITMAPINFO bminfo;
-		bminfo.bmiHeader.biBitCount = 32;
-		bminfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-		bminfo.bmiHeader.biCompression = BI_RGB;//BI_BITFIELDS;
-		bminfo.bmiHeader.biPlanes = 1;
-		bminfo.bmiHeader.biWidth = width;
-		bminfo.bmiHeader.biHeight = height;
-		bminfo.bmiHeader.biSizeImage = width * 4 * height; // must be DWORD aligned
-		bminfo.bmiHeader.biXPelsPerMeter = 0;
-		bminfo.bmiHeader.biYPelsPerMeter = 0;
-		bminfo.bmiHeader.biClrUsed = 0;
-		bminfo.bmiHeader.biClrImportant = 0;
-		
-
-		// get bitmap info from the bitmap
-		//ret = GetDIBits(mTarget, mBmp, 0, mHeight, NULL, (BITMAPINFO *) &bminfo, DIB_RGB_COLORS);
-		//assert(ret);
-
-		if( ! bmpBuffer ) bmpBuffer = malloc(bminfo.bmiHeader.biSizeImage);
-		memset( bmpBuffer, 0, bminfo.bmiHeader.biSizeImage );
-		int r = GetDIBits(target, bmp, 0, height, bmpBuffer, &bminfo, DIB_RGB_COLORS);
-		#if 0
-		printf( "RR2: %d\n", r );
-		FILE * f = fopen( "test.ppm", "wb" );
-		fprintf( f, "P6\n%d %d\n255\n", width, height );
-		//printf( "%08x %08x %08x\n", bmpBuffer[300], bmpBuffer[301], bmpBuffer[302] );
-		int x, y;
-		for( y = 0; y < height; y++ )
-		{
-			for( x = 0; x < width; x++ )
-			{
-				//printf( "%08x", bmpBuffer[x+y*width] );
-				uint8_t rk[3] = 
-				{
-					(bmpBuffer[x+y*width]>>16)&0xff,
-					(bmpBuffer[x+y*width]>>8)&0xff,
-					(bmpBuffer[x+y*width]>>0)&0xff,
-				};
-				fwrite( rk, 3, 1, f );
-			}
-			//printf( "\n" );
-		}
-		fclose( f );
-		#endif
-	}
-	double deltb = OGGetAbsoluteTime() - st;
-	printf( "Timings: %08x -> %f %f\n", color, delt, deltb );
-    ReleaseDC(NULL, screen);
-	return 0;
-}
-
-
-
-#endif

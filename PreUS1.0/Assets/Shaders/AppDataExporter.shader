@@ -152,7 +152,7 @@
 				}
 
 				uint4 exp = asuint( testvar );
-				int spxr = sp.x & 0x7;
+				uint spxr = sp.x & 0x7;
 				float4 cc = float4( (((( spxr&1 )?exp.xy:exp.zw)>>((spxr/2)*8))&0xff) / 255.0, 0.0, 1.0 );
 				return float4( GammaToLinearSpaceExact( cc.r ), GammaToLinearSpaceExact( cc.g ), GammaToLinearSpaceExact( cc.b ), GammaToLinearSpaceExact( cc.a ) );
 			}
