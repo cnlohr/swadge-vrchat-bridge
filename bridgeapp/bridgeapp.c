@@ -409,7 +409,7 @@ void SendPacketToSwadge()
 	
 	
 	OGUnlockMutex( mutSendDataBank );
-	printf( "PL: %d %d\n", pack - buff, now );
+	//printf( "PL: %d %d\n", pack - buff, now );
 
 	
 	uint32_t assetCounts = 0;
@@ -681,6 +681,9 @@ int main( int argc, char ** argv )
 				
 				{
 					uint8_t dmx512[512];
+					
+#if 0
+					// Really basic colorchord.
 					int max_lin_leds = 128;
 					int l;
 					for( l = 0; l < 128; l++ )
@@ -702,7 +705,49 @@ int main( int argc, char ** argv )
 						dmx512[l*3+1] = bb >> 8;
 						dmx512[l*3+2] = bb >> 0;
 					}
-					
+#endif
+					int l;
+					static int frame; frame++;
+					for( l = 0; l < 84; l++ )
+					{
+						int lx = (l % 2) + 2;
+						int ly = l/2 + 184;
+						uint32_t bb = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
+						int r = (bb>>16)&0xff;
+						int g = (bb>>8)&0xff;
+						int b = (bb>>0)&0xff;
+
+						int tl = 84 - l;
+						lx = (tl % 2) + 4;
+						ly = tl/2 + 184;
+						uint32_t b01 = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
+						lx = (tl % 2) + 6;
+						ly = tl/2 + 184;
+						uint32_t b23 = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
+						
+						int b0 = (b01 >> 16)&0xff;
+						int b1 = (b01 >> 8 )&0xff;
+						int b2 = (b23 >> 16)&0xff;
+						int b3 = (b23 >> 8 )&0xff;
+						
+						//printf( "%d %d %d %d %d\n", l, b0, b1, b2, b3 );
+						
+						float bbm = ( b0 + b1 + b2 + b3 + 8 ) / 800.0;
+						r *= bbm;
+						g *= bbm;
+						b *= bbm;
+						
+						if( r < 0 ) r = 0; if( r > 255 ) r = 255;
+						if( g < 0 ) g = 0; if( g > 255 ) g = 255;
+						if( b < 0 ) b = 0; if( b > 255 ) b = 255;
+						
+						dmx512[l*3+0] = r;
+						dmx512[l*3+1] = g;
+						dmx512[l*3+2] = b;
+						dmx512[501-l*3+0] = r;
+						dmx512[501-l*3+1] = g;
+						dmx512[501-l*3+2] = b;
+					}
 					//static int frame;
 					//frame++;
 					//for( l = 0; l < 512; l++ ) dmx512[l] = frame;

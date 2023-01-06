@@ -100,6 +100,15 @@ void * SwadgeDMXThread( void * v )
 	}
 }
 
+void CopyColor( uint8_t * out, int poso, uint8_t * in, int posi )
+{
+	int oo = poso;
+	int ii = posi;
+	out[(oo)*3+0] = in[(ii)*3+0];
+	out[(oo)*3+1] = in[(ii)*3+1];
+	out[(oo)*3+2] = in[(ii)*3+2];
+}
+
 void SwadgeUpdateDMX( uint8_t * data, int length )
 {
 	if( !swadgedmxthread )
@@ -116,7 +125,44 @@ void SwadgeUpdateDMX( uint8_t * data, int length )
 	{
 		swadgedmxdata = realloc( swadgedmxdata, length );
 	}
-	memcpy( swadgedmxdata, data, length );
+	
+	// Total of 168 lights.
+	
+	// Chacer to test.
+#if 0
+	static int frame;
+	frame++;
+	memset( data, 0, 512 );
+	data[(frame%168)*3+0] = 0xff;
+	data[(frame%168)*3+1] = 0xff;
+	data[(frame%168)*3+2] = 0xff;
+#endif
+
+	// Adam's MAGFest setup.  This was chosen randomly and fixed in software.
+	// 1         6
+	// 2         5
+	//   7  3  4  
+	int i;
+	for( i = 0; i < 24; i++ )
+		CopyColor( swadgedmxdata, i, data, i );
+	for( ; i < 24*2; i++ )
+		CopyColor( swadgedmxdata, i, data, i );
+	for( ; i < 24*3; i++ )
+		CopyColor( swadgedmxdata, i, data, 24*3+(24-(i%24)-1) );
+	for( ; i < 24*4; i++ )
+		CopyColor( swadgedmxdata, i, data, 24*4+(i%24) );
+	for( ; i < 24*5; i++ )
+		CopyColor( swadgedmxdata, i, data, 24*5+(24-(i%24)-1) );
+	for( ; i < 24*6; i++ )
+		CopyColor( swadgedmxdata, i, data, 24*6+(i%24) );
+	for( ; i < 24*7; i++ )
+		CopyColor( swadgedmxdata, i, data, 24*2+(24-(i%24)-1));
+	for( i=i*3; i < length; i++ )
+	{
+		swadgedmxdata[i] = 0;
+	}
+	
+//	memcpy( swadgedmxdata, data, length );
 	swadgedmxdatalen = length;
 
 	#ifndef FREEWHEEL_DMX_UPDATES
