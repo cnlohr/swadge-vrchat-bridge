@@ -197,7 +197,7 @@
 						{
 							// Classic AudioLink
 							int xpx = sp.x%2;
-							int bandS = (sp.x/2)*2;
+							int bandS = ((sp.x)&2);
 							return float4(
 								AudioLinkData( ALPASS_AUDIOLINK + uint2( ypx*2+xpx, bandS ) ).r,
 								AudioLinkData( ALPASS_AUDIOLINK + uint2( ypx*2+xpx, bandS+1 ) ).r,
