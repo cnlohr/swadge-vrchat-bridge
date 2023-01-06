@@ -708,31 +708,56 @@ int main( int argc, char ** argv )
 #endif
 					int l;
 					static int frame; frame++;
-					for( l = 0; l < 84; l++ )
+					int classic = 0;  //If 0 uses autocorr
+					int twopole = 0;
+					int nrl = twopole?24:84;
+					for( l = 0; l < nrl; l++ )
 					{
-						int lx = (l % 2) + 2;
-						int ly = l/2 + 184;
+						int cccell = (l / (float)(nrl))*128;
+
+						int lx = (cccell% 2) + 2;
+						int ly = cccell/2 + 184;
 						uint32_t bb = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
 						int r = (bb>>16)&0xff;
 						int g = (bb>>8)&0xff;
 						int b = (bb>>0)&0xff;
 
-						int tl = 84 - l;
-						lx = (tl % 2) + 4;
-						ly = tl/2 + 184;
-						uint32_t b01 = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
-						lx = (tl % 2) + 6;
-						ly = tl/2 + 184;
-						uint32_t b23 = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
+						int tl = nrl - l; //asymmetric (84-83) = 1.
 						
-						int b0 = (b01 >> 16)&0xff;
-						int b1 = (b01 >> 8 )&0xff;
-						int b2 = (b23 >> 16)&0xff;
-						int b3 = (b23 >> 8 )&0xff;
 						
-						//printf( "%d %d %d %d %d\n", l, b0, b1, b2, b3 );
-						
-						float bbm = ( b0 + b1 + b2 + b3 + 8 ) / 800.0;
+						float bbm  = 1.0;
+						if( classic )
+						{
+							int ccsamp = twopole?(tl*2):tl;
+							lx = (ccsamp % 2) + 4;
+							ly = ccsamp/2 + 184;
+							uint32_t b01 = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
+							lx = (ccsamp % 2) + 6;
+							ly = ccsamp/2 + 184;
+							uint32_t b23 = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
+							
+							int b0 = (b01 >> 16)&0xff;
+							int b1 = (b01 >> 8 )&0xff;
+							int b2 = (b23 >> 16)&0xff;
+							int b3 = (b23 >> 8 )&0xff;
+							
+							//printf( "%d %d %d %d %d\n", l, b0, b1, b2, b3 );
+							
+							bbm = ( b0 + b1 + b2 + b3 + 8 ) / 800.0;
+						} else {
+							int ccsamp = twopole?(tl*3):tl;
+
+							lx = (ccsamp % 2) + 8;
+							ly = ccsamp/2 + 184;
+							uint32_t b01 = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
+							
+							int b0 = (b01 >> 16)&0xff;
+							int b1 = (b01 >> 8 )&0xff;
+							//printf( "%d %d %d %d %d\n", l, b0, b1, b2, b3 );
+							
+							bbm = ( b0 + b1 + 8 ) / 500.0;							
+						}
+
 						r *= bbm;
 						g *= bbm;
 						b *= bbm;
