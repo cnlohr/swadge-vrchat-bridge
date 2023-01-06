@@ -20,12 +20,15 @@
 #define CAPWIDTH 64
 #define DATAHEIGHT 608
 
+#define AORUS_MOBO_LEDS_IMPLEMENTATION
+#include "aorus_mobo_leds.h"
 
 #define SWADGEHOST_IMPLEMENTATION
 #include "../lib/swadgehost.h"
 
 #include "packagingfunctions.h"
 
+#define IS_MOBILE_CART 1
 
 int demomode = 1;
 swadge_t * swadge;
@@ -459,6 +462,134 @@ void SwadgeSetup()
 	OGCreateThread( SwadgeReceiver, 0 );
 }
 
+void ComputeRGBs( int ox, int oy, int classic, int twopole, int doaorus )
+{
+	uint8_t dmx512[512];
+	int l;
+#if 0
+	// Really basic colorchord.
+	int max_lin_leds = 128;
+	int l;
+	for( l = 0; l < 128; l++ )
+	{
+		int lx = (l%2)+2;
+		int ly = l/2 + 184;
+		uint32_t bb = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
+		dmx512[l*3+0] = bb >> 16;
+		dmx512[l*3+1] = bb >> 8;
+		dmx512[l*3+2] = bb >> 0;
+	}
+	for( ; l < sizeof( dmx512 ) / 3; l++ )
+	{
+		int tid = l - 128;
+		int lx = (tid%2)+0;
+		int ly = tid/2 + 184;
+		uint32_t bb = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
+		dmx512[l*3+0] = bb >> 16;
+		dmx512[l*3+1] = bb >> 8;
+		dmx512[l*3+2] = bb >> 0;
+	}
+#endif
+	//int classic = 0;  //If 0 uses autocorr
+	//int twopole = 0;
+	int nrl = twopole?24:84;
+	for( l = 0; l < nrl; l++ )
+	{
+		int cccell = (l / (float)(nrl))*128;
+
+		int lx = (cccell% 2) + 2;
+		int ly = cccell/2 + 184;
+		uint32_t bb = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
+		int r = (bb>>16)&0xff;
+		int g = (bb>>8)&0xff;
+		int b = (bb>>0)&0xff;
+
+		int tl = nrl - l; //asymmetric (84-83) = 1.
+		
+		
+		float bbm  = 1.0;
+		if( classic )
+		{
+			int ccsamp = twopole?(tl*2):tl;
+			lx = (ccsamp % 2) + 4;
+			ly = ccsamp/2 + 184;
+			uint32_t b01 = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
+			lx = (ccsamp % 2) + 6;
+			ly = ccsamp/2 + 184;
+			uint32_t b23 = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
+			
+			int b0 = (b01 >> 16)&0xff;
+			int b1 = (b01 >> 8 )&0xff;
+			int b2 = (b23 >> 16)&0xff;
+			int b3 = (b23 >> 8 )&0xff;
+			
+			//printf( "%d %d %d %d %d\n", l, b0, b1, b2, b3 );
+			
+			bbm = ( b0 + b1 + b2 + b3 + 8 ) / 800.0;
+		} else {
+			int ccsamp = twopole?(tl*3):tl;
+
+			lx = (ccsamp % 2) + 8;
+			ly = ccsamp/2 + 184;
+			uint32_t b01 = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
+			
+			int b0 = (b01 >> 16)&0xff;
+			int b1 = (b01 >> 8 )&0xff;
+			//printf( "%d %d %d %d %d\n", l, b0, b1, b2, b3 );
+			
+			bbm = ( b0 + b1 + 8 ) / 500.0;							
+		}
+
+		r *= bbm;
+		g *= bbm;
+		b *= bbm;
+		
+		if( r < 0 ) r = 0; if( r > 255 ) r = 255;
+		if( g < 0 ) g = 0; if( g > 255 ) g = 255;
+		if( b < 0 ) b = 0; if( b > 255 ) b = 255;
+		
+		dmx512[l*3+0] = r;
+		dmx512[l*3+1] = g;
+		dmx512[l*3+2] = b;
+		if( twopole )
+		{
+			dmx512[72+l*3+0] = r;
+			dmx512[72+l*3+1] = g;
+			dmx512[72+l*3+2] = b;
+		}
+		else if( doaorus )
+		{
+		}
+		else
+		{
+			dmx512[501-l*3+0] = r;
+			dmx512[501-l*3+1] = g;
+			dmx512[501-l*3+2] = b;
+		}
+	}
+	static int frame;
+	frame++;
+	//for( l = 0; l < 512; l++ ) dmx512[l] = frame;
+	if( doaorus )
+	{
+
+		uint8_t aorusin[768] = { 0 };
+		int i;
+		for( i = 0; i < 72; i++ )
+		{
+			aorusin[i*4+0] = dmx512[i*3+0];
+			aorusin[i*4+1] = dmx512[i*3+1];
+			aorusin[i*4+2] = dmx512[i*3+2];
+		}
+		UpdateAORUSMobo( aorusin, 72*4 );
+	}
+	else
+	{
+		SwadgeUpdateDMX( dmx512, sizeof( dmx512 ) );
+	}
+}
+
+
 int main( int argc, char ** argv )
 {
 	char cts[256];
@@ -680,105 +811,19 @@ int main( int argc, char ** argv )
 				}
 				
 				{
-					uint8_t dmx512[512];
+					ComputeRGBs( ox, oy, IS_MOBILE_CART, IS_MOBILE_CART, 0 ); // classic/twopole/aorus
 					
-#if 0
-					// Really basic colorchord.
-					int max_lin_leds = 128;
-					int l;
-					for( l = 0; l < 128; l++ )
+					static int checked_aorus;
+					static int aorus_present;
+					if( !checked_aorus )
 					{
-						int lx = (l%2)+2;
-						int ly = l/2 + 184;
-						uint32_t bb = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
-						dmx512[l*3+0] = bb >> 16;
-						dmx512[l*3+1] = bb >> 8;
-						dmx512[l*3+2] = bb >> 0;
+						aorus_present = IsAORUSPresent();
 					}
-					for( ; l < sizeof( dmx512 ) / 3; l++ )
+					if( aorus_present )
 					{
-						int tid = l - 128;
-						int lx = (tid%2)+0;
-						int ly = tid/2 + 184;
-						uint32_t bb = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
-						dmx512[l*3+0] = bb >> 16;
-						dmx512[l*3+1] = bb >> 8;
-						dmx512[l*3+2] = bb >> 0;
+						ComputeRGBs( ox, oy, IS_MOBILE_CART, 0, 1 ); // classic/twopole/aorus
 					}
-#endif
-					int l;
-					static int frame; frame++;
-					int classic = 0;  //If 0 uses autocorr
-					int twopole = 0;
-					int nrl = twopole?24:84;
-					for( l = 0; l < nrl; l++ )
-					{
-						int cccell = (l / (float)(nrl))*128;
-
-						int lx = (cccell% 2) + 2;
-						int ly = cccell/2 + 184;
-						uint32_t bb = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
-						int r = (bb>>16)&0xff;
-						int g = (bb>>8)&0xff;
-						int b = (bb>>0)&0xff;
-
-						int tl = nrl - l; //asymmetric (84-83) = 1.
-						
-						
-						float bbm  = 1.0;
-						if( classic )
-						{
-							int ccsamp = twopole?(tl*2):tl;
-							lx = (ccsamp % 2) + 4;
-							ly = ccsamp/2 + 184;
-							uint32_t b01 = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
-							lx = (ccsamp % 2) + 6;
-							ly = ccsamp/2 + 184;
-							uint32_t b23 = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
-							
-							int b0 = (b01 >> 16)&0xff;
-							int b1 = (b01 >> 8 )&0xff;
-							int b2 = (b23 >> 16)&0xff;
-							int b3 = (b23 >> 8 )&0xff;
-							
-							//printf( "%d %d %d %d %d\n", l, b0, b1, b2, b3 );
-							
-							bbm = ( b0 + b1 + b2 + b3 + 8 ) / 800.0;
-						} else {
-							int ccsamp = twopole?(tl*3):tl;
-
-							lx = (ccsamp % 2) + 8;
-							ly = ccsamp/2 + 184;
-							uint32_t b01 = bmpBuffer[width*(DATAHEIGHT-ly+oy-1)+lx+ox];
-							
-							int b0 = (b01 >> 16)&0xff;
-							int b1 = (b01 >> 8 )&0xff;
-							//printf( "%d %d %d %d %d\n", l, b0, b1, b2, b3 );
-							
-							bbm = ( b0 + b1 + 8 ) / 500.0;							
-						}
-
-						r *= bbm;
-						g *= bbm;
-						b *= bbm;
-						
-						if( r < 0 ) r = 0; if( r > 255 ) r = 255;
-						if( g < 0 ) g = 0; if( g > 255 ) g = 255;
-						if( b < 0 ) b = 0; if( b > 255 ) b = 255;
-						
-						dmx512[l*3+0] = r;
-						dmx512[l*3+1] = g;
-						dmx512[l*3+2] = b;
-						dmx512[501-l*3+0] = r;
-						dmx512[501-l*3+1] = g;
-						dmx512[501-l*3+2] = b;
-					}
-					//static int frame;
-					//frame++;
-					//for( l = 0; l < 512; l++ ) dmx512[l] = frame;
-					SwadgeUpdateDMX( dmx512, sizeof( dmx512 ) );
 				}
-
 				for( y = 248; y < 584; y++ )
 				{
 					if( y < 248+10 )
