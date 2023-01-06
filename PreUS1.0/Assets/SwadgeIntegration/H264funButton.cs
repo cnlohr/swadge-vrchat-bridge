@@ -77,9 +77,9 @@ public class H264funButton : UdonSharpBehaviour
 		{
 			textOut.text = $"Unity Video\nTime: {time}\nPlaying: {unityVideo.IsPlaying}\nCount: {interact_count}";
 			putTextureOn.GetComponent<Renderer>().material.SetTexture( "_MainTex", stealTextureFrom.GetComponent<Renderer>().material.GetTexture("_MainTex") );
-			putTextureOnMat.SetTexture( "_MainTex", stealTextureFrom.GetComponent<Renderer>().material.GetTexture("_MainTex") );
-			CopyMat.SetTexture( "_MainTex", stealTextureFrom.GetComponent<Renderer>().material.GetTexture("_MainTex") );
-			CopyMat2.SetTexture( "_MainTex", stealTextureFrom.GetComponent<Renderer>().material.GetTexture("_MainTex") );
+			if(Utilities.IsValid( putTextureOnMat ) ) putTextureOnMat.SetTexture( "_MainTex", stealTextureFrom.GetComponent<Renderer>().material.GetTexture("_MainTex") );
+			if(Utilities.IsValid( CopyMat ) ) CopyMat.SetTexture( "_MainTex", stealTextureFrom.GetComponent<Renderer>().material.GetTexture("_MainTex") );
+			if(Utilities.IsValid( CopyMat2 ) ) CopyMat2.SetTexture( "_MainTex", stealTextureFrom.GetComponent<Renderer>().material.GetTexture("_MainTex") );
 		}
 	}
 	
