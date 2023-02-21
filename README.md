@@ -1,5 +1,12 @@
 # swadge-vrchat-bridge
 
+# System Overview
+
+![System Overview](https://github.com/cnlohr/swadge-vrchat-bridge/blob/master/system_diagram.png?raw=true)
+
+
+# Editing
+
 
  * Open Project
  * Add VRCSDK3-WORLD-2022.02.16.19.13_Public.unitypackage
