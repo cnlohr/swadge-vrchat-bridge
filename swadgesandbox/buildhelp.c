@@ -4,7 +4,12 @@
 #include <stdint.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#if defined( WINDOWS ) || defined( _WIN32 )
+#define usleep(x) Sleep((x)/1000)
+#else
 #include <unistd.h>
+#endif
 
 #include "hidapi.h"
 #include "hidapi.c"

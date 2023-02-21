@@ -14,11 +14,11 @@ endif
 
 # Do a dance with these to get the files you need.
 
-#SWADGE_ROOT:=C:/projects/Super-2023-Swadge-FW
-SWADGE_ROOT:=~/git/Super-2023-Swadge-FW
+SWADGE_ROOT:=C:/projects/Super-2023-Swadge-FW
+#SWADGE_ROOT:=~/git/Super-2023-Swadge-FW
 
-#SYSELF:=$(SWADGE_ROOT)/build/swadge-esp32.elf
-SYSELF:=../flashelf/swadge-esp32.elf
+SYSELF:=$(SWADGE_ROOT)/build/swadge-esp32.elf
+#SYSELF:=../flashelf/swadge-esp32.elf
 
 CFLAGS+=-I../lib
 
@@ -33,7 +33,7 @@ sandbox.o : buildhelp sandbox.c $(SYSELF) build
 
 build/sandbox_data.bin : sandbox.o
 
-run : sandbox_upload build/sandbox_data.bin build/sandbox_inst.bin
+run : sandbox_upload # build/sandbox_data.bin build/sandbox_inst.bin
 	SWADGE_ROOT=$(SWADGE_ROOT) ./sandbox_upload
 
 buildhelp : buildhelp.c

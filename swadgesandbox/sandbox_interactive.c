@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdint.h>
+#if defined( WINDOWS ) || defined( WIN32 ) || defined( WIN64 ) 
 #include <unistd.h>
+#else
+#define usleep(x) Sleep((x)/1000)
+#endif
 
 #include "hidapi.h"
 #include "hidapi.c"
@@ -132,13 +136,16 @@ int main( int argc, char ** argv )
 				if( tries++ > 10 ) { fprintf( stderr, "Error sending feature report on command %d (%d)\n", rdata[1], r ); return -85; }
 			} while ( r < 6 );
 			tries = 0;
-
+#ifdef WIN32
+			system( "make run" );
+#else
 		    clock_gettime(CLOCK_REALTIME, &spec_start );
 			system( "make run" );
 		    clock_gettime(CLOCK_REALTIME, &spec_end );
 			uint64_t ns_start = ((uint64_t)spec_start.tv_nsec) + ((uint64_t)spec_start.tv_sec)*1000000000LL;
 			uint64_t ns_end = ((uint64_t)spec_end.tv_nsec) + ((uint64_t)spec_end.tv_sec)*1000000000LL;
 			printf( "Elapsed: %.3f\n", (ns_end-ns_start)/1000000000.0 );
+#endif
 			first = 0;
 		}
 		
