@@ -2,7 +2,7 @@
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
-
+//Thank you! - DrakenStark
 namespace Bhenaniguns
 {
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
