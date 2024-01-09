@@ -573,13 +573,13 @@ void ComputeRGBs( int ox, int oy, int classic, int twopole, int doaorus )
 	if( doaorus )
 	{
 
-		uint8_t aorusin[768] = { 0 };
+		uint32_t aorusin[72*4] = { 0 };
 		int i;
 		for( i = 0; i < 72; i++ )
 		{
-			aorusin[i*4+0] = dmx512[i*3+0];
-			aorusin[i*4+1] = dmx512[i*3+1];
-			aorusin[i*4+2] = dmx512[i*3+2];
+			aorusin[i] = ( dmx512[i*3+0] << 0) | 
+				( dmx512[i*3+1] << 8 ) |
+				( dmx512[i*3+2] << 16 );
 		}
 		UpdateAORUSMobo( aorusin, 72*4 );
 	}
@@ -935,7 +935,9 @@ int main( int argc, char ** argv )
 		{
 			// Keep searching
 			is_real_vrchat_window = 0;
+printf( "_______________\n" );
 			EnumWindows( (WNDENUMPROC)EnumWindowsProc, (LPARAM)0 );
+printf( "+WND: %d\n", wnd );
 			CNFGPenX = 65; CNFGPenY = 0;
 			CNFGDrawText( "Searching for VRChat", 2 );
 
@@ -982,7 +984,6 @@ BOOL CALLBACK EnumWindowsProc( HWND hwnd, LONG lParam )
 {
     CHAR windowname[1024] = { 0 };
     CHAR windowexe[1024] = { 0 };
-    SendMessage( hwnd, WM_GETTEXT, sizeof(windowname), (LPARAM)(void*)windowname );
 	DWORD process = 0;
 	DWORD r = GetWindowThreadProcessId( hwnd, &process );
 	HANDLE Handle = OpenProcess(
@@ -998,7 +999,14 @@ BOOL CALLBACK EnumWindowsProc( HWND hwnd, LONG lParam )
 	RECT rect;
 	GetWindowRect( hwnd, &rect );
 
-	if( rect.right - rect.left == 0 && rect.bottom - rect.top == 0 ) return TRUE;
+	if( rect.right - rect.left == 0 && rect.bottom - rect.top == 0 )
+	{
+		return TRUE;
+	}
+
+	printf( "%s\n", windowexe );
+    SendMessage( hwnd, WM_GETTEXT, sizeof(windowname), (LPARAM)(void*)windowname );
+	
 
 //	if( rect.right > 200 && rect.bottom > 200 )
 //		printf( ":%s:%s: %d %d\n", windowname, windowname, rect.right, rect.bottom );
@@ -1012,14 +1020,17 @@ BOOL CALLBACK EnumWindowsProc( HWND hwnd, LONG lParam )
 		wnd = hwnd;
 	}
 
+//C:\Program Files\Unity\Hub\Editor\2022.3.6f1\Editor\Unity.exe / swadge-bridge-demo - VRCDefaultWorldScene - Windows, Mac, Linux - Unity 2022.3.6f1 <DX11> / 3227 / 1448 / 0 / 6279324 / 0
+//printf( "%s / %s / %d / %d / %d / %d / %d\n", windowexe, windowname, rect.right, rect.bottom, is_real_vrchat_window,
+//		mycasestr( windowexe, "editor\\unity" ), mycasestr( windowname, "Windows, Mac, Linux"  ) );
+
 	if( mycasestr( windowexe, "editor\\unity" ) && rect.right > 10 && rect.bottom > 10 && 
-		mycasestr( windowname, "PC, Mac & Linux Standalone" ) && !is_real_vrchat_window )
+		mycasestr( windowname, "Windows, Mac, Linux" ) && !is_real_vrchat_window )
 	{
 		printf( "%s / %s / %d %d\n", windowname, windowexe, rect.right, rect.bottom );
 		printf( "********\n" );
 		wnd = hwnd;
 	}
-
     return TRUE;
 }
 

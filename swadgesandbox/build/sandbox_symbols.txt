@@ -2,71 +2,73 @@
 build/sandbox.o:     file format elf32-little
 
 SYMBOL TABLE:
-4005b354 l    d  .inst	00000000 .inst
-3ffeb644 l    d  .data	00000000 .data
-3ffeb738 l    d  .bss	00000000 .bss
+4005eeb8 l    d  .inst	00000000 .inst
+3ffef214 l    d  .data	00000000 .data
+3ffef378 l    d  .bss	00000000 .bss
 00000000 l    d  .debug_frame	00000000 .debug_frame
 00000000 l    d  .debug_info	00000000 .debug_info
 00000000 l    d  .debug_abbrev	00000000 .debug_abbrev
-00000000 l    d  .debug_loc	00000000 .debug_loc
+00000000 l    d  .debug_loclists	00000000 .debug_loclists
 00000000 l    d  .debug_aranges	00000000 .debug_aranges
-00000000 l    d  .debug_ranges	00000000 .debug_ranges
+00000000 l    d  .debug_rnglists	00000000 .debug_rnglists
 00000000 l    d  .debug_line	00000000 .debug_line
 00000000 l    d  .debug_str	00000000 .debug_str
+00000000 l    d  .debug_line_str	00000000 .debug_line_str
 00000000 l    d  .comment	00000000 .comment
 00000000 l    d  .xtensa.info	00000000 .xtensa.info
 00000000 l    d  .xt.lit	00000000 .xt.lit
 00000000 l    d  .xt.prop	00000000 .xt.prop
 00000000 l    df *ABS*	00000000 sandbox.c
-00000000 l    df *ABS*	00000000 C:\Users\cnlohr\AppData\Local\Temp\ccbcznLQ.o
-4005b608 l       .inst	00000000 _advanced_usb_printf_head
-4005b60c l       .inst	00000000 _GPIO_IN_REG
-4005b628 g       .inst	00000000 asm_read_gpio
-40087b1c g       *ABS*	00000000 loadFont
-4009d490 g       *ABS*	00000000 addRowToMeleeMenu
-3ffeb73c g     O .bss	00000004 menu
-400b48a8 g       *ABS*	00000000 espNowSend
+4005f120 l     F .inst	00000036 mainMenuCb
+00000000 l    df *ABS*	00000000 ccIL9B2k.o
+4005f1d8 l       .inst	00000000 _advanced_usb_printf_head
+4005f1dc l       .inst	00000000 _GPIO_IN_REG
+4005f1f8 g       .inst	00000000 asm_read_gpio
+40035960 g       *ABS*	00000000 esp_log_write
+40088648 g       *ABS*	00000000 checkButtonQueueWrapper
+400a1098 g       *ABS*	00000000 loadFont
+3fff03c4 g     O .bss	00000304 logbook
+3fff06cc g     O .bss	00000004 menu
+400bf394 g       *ABS*	00000000 espNowSend
 4001aba8 g       *ABS*	00000000 memcpy
-4005b4d0 g     F .inst	0000002d uprintf
-3ffeb740 g     O .bss	00001040 rqueue
-400b4538 g       *ABS*	00000000 espNowInit
-3ffeb644 g       .data	00000000 sandbox_sentinel_start_data
-3ffeb730 g     O .data	00000004 menu_MainMenu
-40100e74 g       *ABS*	00000000 meleeMenuButton
+3ffef384 g     O .bss	00001040 rqueue
+3ffef214 g       .data	00000000 sandbox_sentinel_start_data
+3ffef370 g     O .data	00000004 menu_MainMenu
 0000135c g       *ABS*	00000000 sandbox_bss_size
-3ffeb738 g       .data	00000000 sandbox_sentinel_end_data
-4005b3e8 g     F .inst	00000016 menuCb
-4009d420 g       *ABS*	00000000 initMeleeMenu
-3ffeb6ec g     O .data	00000040 sandbox_mode
-4005b641 g       .inst	00000000 sandbox_sentinel_end_inst
-4005b470 g     F .inst	00000060 sandboxAdvancedUSB
-4005b620 g       .inst	00000000 minimal_function
-4005b610 g       .inst	00000000 test_function
-4005b400 g     F .inst	00000058 sandboxRxESPNow
-3ffeb72c g     O .data	00000004 menu_Bootload
-4005b5bc g     F .inst	00000038 sandbox_button
-4005b500 g     F .inst	00000086 sandbox_main
-3ffcf5bc g       *ABS*	00000000 advanced_usb_printf_head
-3ffeb738 g     O .bss	00000004 espNowIsInit
-4005b63c g     F .inst	00000005 sandboxBackgroundDrawCallback
-400873f8 g       *ABS*	00000000 switchToSwadgeMode
-4009d578 g       *ABS*	00000000 drawMeleeMenu
-3ffeb734 g     O .data	00000004 global_i
-4005b5f4 g     F .inst	00000014 dummy
-4005b588 g     F .inst	00000031 sandbox_exit
-4005b354 g       .inst	00000000 sandbox_sentinel_start_inst
-40087bc0 g       *ABS*	00000000 freeFont
-3ffec780 g     O .bss	00000304 meleeMenuFont
-4005b634 g     F .inst	00000005 sandboxTxESPNow
-3ffeca84 g     O .bss	00000004 rqueuehead
-400874d0 g       *ABS*	00000000 advanced_usb_write_log_printf
-3ffeca88 g     O .bss	00000004 stime
-3ffeca8c g     O .bss	00000004 rqueuetail
-40103684 g       *ABS*	00000000 esp_log_level_set
-4005b458 g     F .inst	00000017 sandbox_tick
-3ffcafbc g       *ABS*	00000000 modeMainMenu
-4009d478 g       *ABS*	00000000 deinitMeleeMenu
-3ffeb354 g       .data	00000000 sandbox_sentinel_origin_data
-3ffeca90 g     O .bss	00000004 disp
+3ffef378 g       .data	00000000 sandbox_sentinel_end_data
+3ffef340 g     O .data	0000002c sandbox_mode
+4005f211 g       .inst	00000000 sandbox_sentinel_end_inst
+400a2d28 g       *ABS*	00000000 initMenu
+4005f158 g     F .inst	0000005c sandboxAdvancedUSB
+400bef20 g       *ABS*	00000000 initEspNow
+3ffcc2f0 g       *ABS*	00000000 mainMenuMode
+400a3204 g       *ABS*	00000000 initMenuLogbookRenderer
+3fff06c8 g     O .bss	00000004 menuLogbookRenderer
+40035a18 g       *ABS*	00000000 esp_log_timestamp
+4005f1f0 g       .inst	00000000 minimal_function
+4005f1e0 g       .inst	00000000 test_function
+4005ef60 g     F .inst	00000053 sandboxRxESPNow
+400a3308 g       *ABS*	00000000 drawMenuLogbook
+400a2d54 g       *ABS*	00000000 deinitMenu
+3ffef36c g     O .data	00000004 menu_Bootload
+4005efb4 g     F .inst	000000e2 sandbox_main
+3ffd16f8 g       *ABS*	00000000 advanced_usb_printf_head
+3fff06d0 g     O .bss	00000004 espNowIsInit
+4005f20c g     F .inst	00000005 sandboxBackgroundDrawCallback
+40088634 g       *ABS*	00000000 switchToSwadgeMode
+3ffef374 g     O .data	00000004 global_i
+400a2dbc g       *ABS*	00000000 addSingleItemToMenu
+4005f1b4 g     F .inst	00000024 dummy
+40010068 g       *ABS*	00000000 software_reset
+4005f098 g     F .inst	0000004a sandbox_exit
+4005eeb8 g       .inst	00000000 sandbox_sentinel_start_inst
+4005f204 g     F .inst	00000005 sandboxTxESPNow
+3ffef380 g     O .bss	00000004 rqueuehead
+3ffef378 g     O .bss	00000004 stime
+3ffef37c g     O .bss	00000004 rqueuetail
+4011b198 g       *ABS*	00000000 esp_log_level_set
+4005f0e4 g     F .inst	00000039 sandbox_tick
+3ffeeeb8 g       .data	00000000 sandbox_sentinel_origin_data
+400a311c g       *ABS*	00000000 menuButton
 
 

@@ -14,10 +14,10 @@ endif
 
 # Do a dance with these to get the files you need.
 
-SWADGE_ROOT:=C:/projects/Super-2023-Swadge-FW
+SWADGE_ROOT:=C:/projects/Super-2024-Swadge-FW
 #SWADGE_ROOT:=~/git/Super-2023-Swadge-FW
 
-SYSELF:=$(SWADGE_ROOT)/build/swadge-esp32.elf
+SYSELF:=$(SWADGE_ROOT)/build/swadge2024.elf
 #SYSELF:=../flashelf/swadge-esp32.elf
 
 CFLAGS+=-I../lib
@@ -26,24 +26,24 @@ build :
 	mkdir -p build
 
 sandbox.o : buildhelp sandbox.c $(SYSELF) build
-	SWADGE_ROOT=$(SWADGE_ROOT) ./buildhelp $(SYSELF)
+	SWADGE_ROOT=$(SWADGE_ROOT) ./buildhelp $(SYSELF) $(SWADGE_ROOT)
 	xtensa-esp32s2-elf-objdump -s build/sandbox.o > build/debug_sandbox_s.txt
 	xtensa-esp32s2-elf-objdump -t build/sandbox.o > build/debug_sandbox_t.txt
 	xtensa-esp32s2-elf-objdump -S build/sandbox.o > build/debug_sandbox_S.txt
 
 build/sandbox_data.bin : sandbox.o
 
-run : sandbox_upload # build/sandbox_data.bin build/sandbox_inst.bin
+run : sandbox_upload build/sandbox_data.bin
 	SWADGE_ROOT=$(SWADGE_ROOT) ./sandbox_upload
 
 buildhelp : buildhelp.c
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CC) $(CFLAGS) $^ $(LDFLAGS)
 
 sandbox_upload : sandbox_upload.c
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CC) $(CFLAGS) $^ $(LDFLAGS)
 
 sandbox_interactive : sandbox_interactive.c
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CC) $(CFLAGS) $^ $(LDFLAGS)
 
 monitor : sandbox_interactive
 	SWADGE_ROOT=$(SWADGE_ROOT) ./sandbox_interactive

@@ -1,13 +1,10 @@
 #include <stdio.h>
 #include <stdint.h>
-#if defined( WINDOWS ) || defined( WIN32 ) || defined( WIN64 ) 
-#include <unistd.h>
-#else
-#endif
+//#include <unistd.h>
 #include <sys/stat.h>
 
-#include "hidapi.h"
-#include "hidapi.c"
+#include "../hidapi.h"
+#include "../hidapi.c"
 
 #define VID 0x303a
 #define PID 0x4004
@@ -26,6 +23,43 @@ const int reg_packet_length = 64;
 
 const int alignlen = 4;
 int tries = 0;
+
+#if 0
+void PrintMemoryAt( uint32_t address )
+{
+	uint32_t offset = address;
+	uint8_t rdata[force_packet_length];
+	rdata[0] = 171;  // Code for advanced USB control
+	rdata[1] = 5;    // Command # (Read)
+	rdata[2] = offset & 0xff;
+	rdata[3] = offset >> 8;
+	rdata[4] = offset >> 16;
+	rdata[5] = offset >> 24;
+	int readlen = 32;
+	rdata[6] = readlen & 0xff;
+	rdata[7] = readlen >> 8;
+	printf( "Reading %d bytes from 0x%08x\n", readlen, (uint32_t)offset );
+
+	int r;
+	do
+	{
+		r = hid_send_feature_report( hd, rdata, force_packet_length  );
+		if( tries++ > 10 ) { fprintf( stderr, "Error: failed to write into scratch buffer %d (%d)\n", rdata[1], r ); return -94; }
+	} while ( r < readlen+8 );
+	tries = 0;
+	do
+	{
+		rdata[0] = 170;
+		r = hid_get_feature_report( hd, rdata, sizeof(rdata) );
+		if( tries++ > 10 ) { fprintf( stderr, "Error reading feature report on command %d (%d)\n", rdata[1], r ); return -85; }
+	} while ( r < 10 );
+	int i;
+	for( i = 0; i < 32; i++ )
+	{
+		printf( "%02x ", rdata[i] );
+	}
+}
+#endif
 
 int DoUpload( const char * file, uint32_t address )
 {
@@ -106,13 +140,12 @@ int DoUpload( const char * file, uint32_t address )
 int main()
 {
 	hid_init();
-	hd = hid_open( VID, PID, L"420690" );
+	hd = hid_open( VID, PID, 0);
 	if( !hd ) { fprintf( stderr, "Could not open USB\n" ); return -94; }
 
 	// Parse through sandbox_symbols.txt and find the sandbox, itself.
 	uint32_t sandbox_main_address = 0;
 	uint32_t sandbox_mode_address = 0;
-	uint32_t data_segment_origin = 0;
 	uint32_t sandbox_start_address_inst = 0;
 	uint32_t sandbox_start_address_data = 0;
 	uint32_t sandbox_sentinel_end_data = 0;
@@ -138,10 +171,6 @@ int main()
 			{
 				sandbox_main_address = strtol( addy, 0, 16 );
 				printf( "Found sandbox_main at 0x%08x\n", sandbox_main_address );
-			}
-			if( strcmp( size, "sandbox_sentinel_origin_data" ) == 0 )
-			{
-				data_segment_origin = strtol( addy, 0, 16 );;
 			}
 			if( strcmp( name, "sandbox_mode" ) == 0 && l == 6 )
 			{
@@ -180,9 +209,9 @@ int main()
 	}
 
 	int r;
-
 	// Disable mode.
 	uint8_t rdata[reg_packet_length];
+#if 0
 	rdata[0] = 170;
 	rdata[1] = 7;
 	rdata[2] = 0 & 0xff;
@@ -195,32 +224,10 @@ int main()
 		if( tries++ > 10 ) { fprintf( stderr, "Error sending feature report on command %d (%d)\n", rdata[1], r ); return -85; }
 	} while ( r < 6 );
 	tries = 0;
-
-	// Give it a chance to exit.
-#if defined( WINDOWS ) || defined( WIN32 ) || defined( WIN64 ) 
-	Sleep( 150 );
-#else
-	usleep( 150000 );
 #endif
-
-	// In case we are using this solely as an upload and are not building.
-	int total_segment_size = sandbox_sentinel_end_data - data_segment_origin + sandbox_bss_size;
-	rdata[0] = 170;
-	rdata[1] = 8;
-	rdata[2] = total_segment_size;
-	rdata[3] = total_segment_size>>8;
-	rdata[4] = total_segment_size>>16;
-	rdata[5] = total_segment_size>>24;
-	do
-	{
-		r = hid_send_feature_report( hd, rdata, 65 );
-		if( tries++ > 10 ) { fprintf( stderr, "Error sending feature report on command %d (%d)\n", rdata[1], r ); return -85; }
-	} while ( r != 65 );
-	tries = 0;
-	printf( "Allocation size to %d\n", total_segment_size );
-
-#if defined( WINDOWS ) || defined( WIN32 ) || defined( WIN64 ) 
-	Sleep( 50 );
+	// Give it a chance to exit.
+#ifdef WIN32
+		Sleep( 50 );
 #else
 	usleep( 50000 );
 #endif

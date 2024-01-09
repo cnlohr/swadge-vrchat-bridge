@@ -1,13 +1,9 @@
 #include <stdio.h>
 #include <stdint.h>
-#if defined( WINDOWS ) || defined( WIN32 ) || defined( WIN64 ) 
 #include <unistd.h>
-#else
-#define usleep(x) Sleep((x)/1000)
-#endif
 
-#include "hidapi.h"
-#include "hidapi.c"
+#include "../hidapi.h"
+#include "../hidapi.c"
 #include <sys/stat.h>
 
 #include <time.h>
@@ -67,7 +63,7 @@ int main( int argc, char ** argv )
 	int first = 1;
 
 	hid_init();
-	hd = hid_open( VID, PID, L"420690" );
+	hd = hid_open( VID, PID, 0 );
 	if( !hd ) { fprintf( stderr, "Could not open USB [interactive]\n" ); return -94; }
 	file_timespecs = calloc( sizeof(struct timespec), argc );
 	CheckTimespec( argc, argv );
@@ -86,33 +82,33 @@ int main( int argc, char ** argv )
 		rdata[0] = 172;
 		r = hid_get_feature_report( hd, rdata, 513 );
 #ifdef WIN32
-		int toprint = r - 3;
+		int toprint = r - 4;
 #else
-		int toprint = r - 2;
+		int toprint = r - 3;
 #endif
 
 		if( r < 0 )
 		{
 			do
 			{
-				hd = hid_open( VID, PID, L"420690" );
+				hd = hid_open( VID, PID, 0 );
 				if( !hd )
 					fprintf( stderr, "Could not open USB\n" );
 				else
 					fprintf( stderr, "Error: hid_get_feature_report failed with error %d\n", r );
 
+#ifdef WIN32
+				Sleep( 100 );
+#else
 				usleep( 100000 );
+#endif
 			} while( !hd );
 
 			continue;
 		}
 		else if( toprint > 0 )
 		{
-#ifdef WIN32
-			WriteConsoleA( hConsole, rdata+2, toprint, 0, 0 );
-#else
 			write( 1, rdata + 2, toprint );
-#endif
 		}
 
 		// Check whatever else.
@@ -136,20 +132,21 @@ int main( int argc, char ** argv )
 				if( tries++ > 10 ) { fprintf( stderr, "Error sending feature report on command %d (%d)\n", rdata[1], r ); return -85; }
 			} while ( r < 6 );
 			tries = 0;
-#ifdef WIN32
+
+		    //clock_gettime(CLOCK_REALTIME, &spec_start );
 			system( "make run" );
-#else
-		    clock_gettime(CLOCK_REALTIME, &spec_start );
-			system( "make run" );
-		    clock_gettime(CLOCK_REALTIME, &spec_end );
-			uint64_t ns_start = ((uint64_t)spec_start.tv_nsec) + ((uint64_t)spec_start.tv_sec)*1000000000LL;
-			uint64_t ns_end = ((uint64_t)spec_end.tv_nsec) + ((uint64_t)spec_end.tv_sec)*1000000000LL;
-			printf( "Elapsed: %.3f\n", (ns_end-ns_start)/1000000000.0 );
-#endif
+		    //clock_gettime(CLOCK_REALTIME, &spec_end );
+			//uint64_t ns_start = ((uint64_t)spec_start.tv_nsec) + ((uint64_t)spec_start.tv_sec)*1000000000LL;
+			//uint64_t ns_end = ((uint64_t)spec_end.tv_nsec) + ((uint64_t)spec_end.tv_sec)*1000000000LL;
+			//printf( "Elapsed: %.3f\n", (ns_end-ns_start)/1000000000.0 );
 			first = 0;
 		}
 		
+#ifdef WIN32
+		Sleep( 2 );
+#else
 		usleep( 2000 );
+#endif
 	} while( 1 );
 
 	hid_close( hd );

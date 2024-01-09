@@ -1,20 +1,17 @@
 #include <stdio.h>
 #include <string.h>
 #include "esp_system.h"
-#include "swadgeMode.h"
-#include "hdw-led/led_util.h"
 #include "hal/gpio_types.h"
 #include "esp_log.h"
 #include "soc/efuse_reg.h"
-#include "soc/rtc_wdt.h"
+#include "rtc_wdt.h"
 #include "soc/soc.h"
 #include "soc/system_reg.h"
 #include "esp_wifi.h"
 #include "esp_private/wifi.h"
-#include "swadge_util.h"
-#include "meleeMenu.h"
-#include "mode_main_menu.h"
-#include "hdw-esp-now/espNowUtils.h"
+#include "hdw-btn.h"
+#include "mainMenu.h"
+#include "hdw-esp-now.h"
 
 #include "nvs_flash.h"
 #include "nvs.h"
@@ -24,9 +21,9 @@
 
 int espNowIsInit = 0;
 int global_i = 100;
-meleeMenu_t * menu;
-font_t meleeMenuFont;
-display_t * disp;
+menu_t * menu;
+menuLogbookRenderer_t* menuLogbookRenderer;
+font_t logbook;
 
 #define RFRXQUEUESIZE 16
 struct RFRXQueueElement
@@ -45,25 +42,26 @@ const char * menu_Bootload = "Bootloader";
 void minimal_function();
 uint32_t asm_read_gpio();
 
-void menuCb(const char* opt)
+static void mainMenuCb(const char* label, bool selected, uint32_t settingVal)
 {
-	if( opt == menu_MainMenu )
-	{
-		switchToSwadgeMode( &modeMainMenu );
-	}
+	if( !selected ) return;
+
+    if( label == mainMenuMode.modeName )
+    {
+        switchToSwadgeMode( &mainMenuMode );
+    }
+    else if( label == menu_Bootload )
+    {
+        // Uncomment this to reboot the chip into the bootloader.
+        // This is to test to make sure we can call ROM functions.
+        REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
+        void software_reset( uint32_t x );
+        software_reset( 0 );
+    }
 }
 
-int advanced_usb_write_log_printf(const char *fmt, va_list args);
-int uprintf( const char * fmt, ... )
-{
-	va_list args;
-	va_start(args, fmt);
-	int r = advanced_usb_write_log_printf(fmt, args);
-	va_end(args);
-	return r;
-}
-
-void sandboxRxESPNow(const uint8_t* mac_addr, const char* data, uint8_t len, int8_t rssi)
+void sandboxRxESPNow(const esp_now_recv_info_t* esp_now_info, const uint8_t* data, uint8_t len,
+                                   int8_t rssi)
 {
 	int next = (rqueuehead+1) & (RFRXQUEUESIZE-1);
 	if( next == rqueuetail ) return;
@@ -73,7 +71,7 @@ void sandboxRxESPNow(const uint8_t* mac_addr, const char* data, uint8_t len, int
 	struct RFRXQueueElement * q = rqueue + rqueuehead;
 	q->datasize = len+7;
 	q->data[0] = rssi;
-	memcpy( q->data+1, mac_addr, 6 );
+	memcpy( q->data+1, esp_now_info->src_addr, 6 );
 	memcpy( q->data+7, data, len );
 	rqueuehead = next;
 }
@@ -87,54 +85,64 @@ void sandboxTxESPNow(const uint8_t* mac_addr, esp_now_send_status_t status)
 
 int dummy( uint32_t a, uint32_t b )
 {
-	uprintf( "DUMMY %08x %08x\n", a, b );
+	ESP_LOGI( ".", "DUMMY %08lx %08lx\n", a, b );
 	return 0;
 }
 
 
 
-void sandbox_main(display_t * disp_in)
+void sandbox_main( void )
 {
 	espNowIsInit = 0;
-	menu = 0; disp = disp_in;
 
-	uprintf( "Running from IRAM. %d\n", global_i );
+	ESP_LOGI( ".", "Running from IRAM. %d\n", global_i );
 	esp_log_level_set( "*", ESP_LOG_VERBOSE ); // Enable logging if there's any way.
 
-	loadFont("mm.font", &meleeMenuFont);
-	menu = initMeleeMenu("USB Sandbox", &meleeMenuFont, menuCb);
-	addRowToMeleeMenu(menu, menu_MainMenu);
-	addRowToMeleeMenu(menu, menu_Bootload);
+    ESP_LOGI( "sandbox", "Running from IRAM. %d", global_i );
 
-	uprintf( "Installing espnow.\n" );
+    //REG_WRITE( GPIO_FUNC7_OUT_SEL_CFG_REG,4 ); // select ledc_ls_sig_out0
 
-    espNowInit(&sandboxRxESPNow, &sandboxTxESPNow, GPIO_NUM_NC,
+    menu = initMenu("USB Sandbox", mainMenuCb);
+    addSingleItemToMenu(menu, mainMenuMode.modeName);
+    addSingleItemToMenu(menu, menu_Bootload);
+    loadFont("logbook.font", &logbook, false);
+    menuLogbookRenderer = initMenuLogbookRenderer(&logbook);
+
+	ESP_LOGI( ".", "Installing espnow.\n" );
+
+//    espNowInit(&sandboxRxESPNow, &sandboxTxESPNow, GPIO_NUM_NC,
+//		GPIO_NUM_NC, UART_NUM_MAX, ESP_NOW_IMMEDIATE);
+
+	esp_err_t er = initEspNow(&sandboxRxESPNow, &sandboxTxESPNow, GPIO_NUM_NC,
 		GPIO_NUM_NC, UART_NUM_MAX, ESP_NOW_IMMEDIATE);
 
 
-	uprintf( "Loaded\n" );
+	ESP_LOGI( ".", "Loaded (%d)\n", er );
 	espNowIsInit = 1;
 }
 
 void sandbox_exit()
 {
-	espNowIsInit = 0;
-	uprintf( "Exit\n" );
-	if( menu )
-	{
-		deinitMeleeMenu(menu);
-		freeFont(&meleeMenuFont);
-	}
-	uprintf( "Exit Complete\n" );
+	espNowIsInit = 0; 
+	ESP_LOGI( ".",  "Exit\n" );
+    if( menu )
+    {
+        deinitMenu(menu);
+    }
+	ESP_LOGI( ".",  "Exit Complete\n" );
 }
 
 
 void sandbox_tick()
 {
-	int i, j;
 	if( menu )
-	    drawMeleeMenu(disp, menu);
+	    drawMenuLogbook(menu, menuLogbookRenderer, 1);
 
+    buttonEvt_t evt              = {0};
+    while (checkButtonQueueWrapper(&evt))
+    {
+        menu = menuButton(menu, evt);
+    }
 #if 0
 	static int seed = 0;
 	int iter;
@@ -268,7 +276,7 @@ void sandbox_tick()
 	#endif
 }
 
-void sandboxBackgroundDrawCallback(display_t* disp, int16_t x, int16_t y, int16_t w, int16_t h, int16_t up, int16_t upNum )
+void sandboxBackgroundDrawCallback(int16_t x, int16_t y, int16_t w, int16_t h, int16_t up, int16_t upNum )
 {
 }
 
@@ -295,48 +303,16 @@ int16_t sandboxAdvancedUSB(uint8_t * buffer, uint16_t length, uint8_t isGet )
 	}
 }
 
-void sandbox_button(buttonEvt_t* evt)
-{
-    if(evt->down)
-    {
-        switch (evt->button)
-        {
-            case UP:
-            case DOWN:
-            case LEFT:
-            case RIGHT:
-            case BTN_A:
-            {
-				uprintf( "%d %d\n", menu, evt->button );
-                meleeMenuButton(menu, evt->button);
-                break;
-            }
-            case START:
-            case SELECT:
-            case BTN_B:
-            default:
-            {
-                break;
-            }
-        }
-    }
-}
-
-swadgeMode sandbox_mode =
+swadgeMode_t sandbox_mode =
 {
     .modeName = "usb_wifi_base",
     .fnEnterMode = sandbox_main,
     .fnExitMode = sandbox_exit,
     .fnMainLoop = sandbox_tick,
-    .fnButtonCallback = sandbox_button,
-	.fnBackgroundDrawCallback = sandboxBackgroundDrawCallback,
-    .fnTouchCallback = NULL,
+    .fnBackgroundDrawCallback = sandboxBackgroundDrawCallback,
 	.overrideUsb = false,
 	.fnAdvancedUSB = sandboxAdvancedUSB,
     .wifiMode = NO_WIFI,
-    .fnEspNowRecvCb = 0,
-    .fnEspNowSendCb = 0,
-    .fnAccelerometerCallback = NULL,
     .fnAudioCallback = NULL,
-    .fnTemperatureCallback = NULL
 };
+

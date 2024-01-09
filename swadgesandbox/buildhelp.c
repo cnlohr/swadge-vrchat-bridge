@@ -4,15 +4,10 @@
 #include <stdint.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+//#include <unistd.h>
 
-#if defined( WINDOWS ) || defined( _WIN32 )
-#define usleep(x) Sleep((x)/1000)
-#else
-#include <unistd.h>
-#endif
-
-#include "hidapi.h"
-#include "hidapi.c"
+#include "../hidapi.h"
+#include "../hidapi.c"
 
 #define VID 0x303a
 #define PID 0x4004
@@ -48,10 +43,8 @@ int main( int argc, char ** argv )
 	uint32_t allocated_addy = 0;
 	uint32_t allocated_size = 0;
 
-	const char * swadgepath = getenv( "SWADGE_ROOT" );
-
 	hid_init();
-	hid_device * hd = hid_open( VID, PID, L"420690" );
+	hid_device * hd = hid_open( VID, PID, 0);
 
 	if( !hd )
 	{
@@ -59,9 +52,9 @@ int main( int argc, char ** argv )
 		return -5;
 	}
 
-	if( argc != 2 )
+	if( argc != 3 )
 	{
-		fprintf( stderr, "Error: Usage: [tool] [ESP32 .elf file]\n" );
+		fprintf( stderr, "Error: Usage: [tool] [ESP32 .elf file] [relative exec path]\n" );
 		return -1;
 	}
 
@@ -150,13 +143,10 @@ int main( int argc, char ** argv )
 			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/esp_rom/include", idf_path ); appendcflag( temp );
 			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/log/include", idf_path ); appendcflag( temp );
 			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/esp_system/include", idf_path ); appendcflag( temp );
-			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/esp_netif/include", idf_path ); appendcflag( temp );
 			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/driver/esp32s2/include", idf_path ); appendcflag( temp );
 			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/esp_ringbuf/include", idf_path ); appendcflag( temp );
 			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/heap/include", idf_path ); appendcflag( temp );
 			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/esp_rom/include/esp32s2", idf_path ); appendcflag( temp );
-			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/spi_flash/include", idf_path ); appendcflag( temp );
-			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/nvs_flash/include", idf_path ); appendcflag( temp );
 			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/newlib/platform_include", idf_path ); appendcflag( temp );
 			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/esp_timer/include", idf_path ); appendcflag( temp );
 			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/freertos/include", idf_path ); appendcflag( temp );
@@ -172,17 +162,55 @@ int main( int argc, char ** argv )
 			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/esp_hw_support/port/esp32s2/private_include", idf_path ); appendcflag( temp );
 			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hal/platform_port/include", idf_path ); appendcflag( temp );
 			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/esp_hw_support/port/esp32s2", idf_path ); appendcflag( temp );
-			
-			snprintf( temp, sizeof( temp ) - 1, "-I%s/components", swadgepath ); appendcflag( temp );
-			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-qma6981", swadgepath ); appendcflag( temp );
-			snprintf( temp, sizeof( temp ) - 1, "-I%s/main/display", swadgepath ); appendcflag( temp );
-			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-btn", swadgepath ); appendcflag( temp );
-			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-led", swadgepath ); appendcflag( temp );
-			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-esp-now", swadgepath ); appendcflag( temp );
-			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-touch", swadgepath ); appendcflag( temp );
-			snprintf( temp, sizeof( temp ) - 1, "-I%s/main", swadgepath ); appendcflag( temp );
-			snprintf( temp, sizeof( temp ) - 1, "-I%s/main/modes", swadgepath ); appendcflag( temp );
-			snprintf( temp, sizeof( temp ) - 1, "-I%s/build/config", swadgepath ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/driver/i2c/include", idf_path ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/freertos/FreeRTOS-Kernel/include", idf_path ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/freertos/esp_additions/include/freertos", idf_path ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/freertos/esp_additions/arch/xtensa/include", idf_path ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/freertos/FreeRTOS-Kernel/portable/xtensa/include", idf_path ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/driver/gpio/include", idf_path ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/driver/touch_sensor/include", idf_path ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/driver/touch_sensor/esp32s2/include", idf_path ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/driver/ledc/include", idf_path ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/driver/uart/include", idf_path ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/nvs_flash/include", idf_path ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/soc/esp32s2/include", idf_path ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/freertos/FreeRTOS-Kernel/include/freertos", idf_path ); appendcflag( temp );
+
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/esp_netif/include", idf_path ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/esp_hw_support/include", idf_path ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/esp_partition/include", idf_path ); appendcflag( temp );
+
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/components/hdw-battmon/include", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-qma6981", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/main/display", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-btn/include", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-bzr/include", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/crashwrap/include", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-touch/include", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-esp-now/include", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-temperature/include", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-imu/include", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-mic/include", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-spiffs/include", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-led/include", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-usb/include", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-battmon/include", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-tft/include", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-led/include", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/components/hdw-nvs/include", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/managed_components/espressif__tinyusb/src", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/managed_components/espressif__esp_tinyusb/include", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/main", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/main/utils", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/main/menu", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/main/modes", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/main/asset_loaders", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/main/modes/mainMenu", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/main/modes/colorchord", argv[2] ); appendcflag( temp );
+			snprintf( temp, sizeof( temp ) - 1, "-I%s/build/config", argv[2] ); appendcflag( temp );
+
+			appendcflag( "-DTUP_DCD_ENDPOINT_MAX=8 -DESP_PLATFORM=1" );
 		}
 
 		int r;
@@ -195,6 +223,22 @@ int main( int argc, char ** argv )
 			r = system( dump_buffer );
 			if( r ) { fprintf( stderr, "Error shelling symbols. Error: %d\n", r ); return -6; }
 		}
+
+
+		// Count
+		{
+			int i = 0;
+			FILE * f = fopen( "build/count.txt", "r" );
+			if( f ) { fscanf( f, "%d", &i ); fclose( f ); }
+			i++;
+			f = fopen( "build/count.txt", "w" );
+			if( f )
+			{
+				fprintf( f, "%d\n", i );
+				fclose( f );
+			}
+		}
+
 
 		{
 			FILE * provided = fopen( "build/provided.lds", "w" );
@@ -409,8 +453,11 @@ int main( int argc, char ** argv )
 			} while ( r != 65 );
 			tries = 0;
 
+#ifdef WIN32
+			Sleep( 20 );
+#else
 			usleep( 20000 );
-			
+#endif
 			printf( "Disabled.\n" );
 			
 			// round up total segment size to a 256-byte boundary (optional)

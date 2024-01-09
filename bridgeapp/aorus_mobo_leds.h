@@ -79,9 +79,10 @@ void * AORUSThreadApp( void * v )
 			int i = 0;
 			for( i = 0; i < 19; i++ )
 			{
-				*(dptr++) = (aorusbuffer[cvled]>>8)&0xff;
-				*(dptr++) = (aorusbuffer[cvled]>>0)&0xff;
-				*(dptr++) = (aorusbuffer[cvled]>>16)&0xff;
+				uint32_t rbuf = aorusbuffer[cvled];
+				*(dptr++) = (rbuf>>8)&0xff;
+				*(dptr++) = (rbuf>>0)&0xff;
+				*(dptr++) = (rbuf>>16)&0xff;
 				if( !all ) cvled++;
 			}
 			*(dptr++) = 0;
@@ -111,9 +112,10 @@ void * AORUSThreadApp( void * v )
 			
 			*(dptr++) = 0x64;
 			*(dptr++) = 0x00;
-			*(dptr++) = (aorusbuffer[cvled]>>16)&0xff;
-			*(dptr++) = (aorusbuffer[cvled]>>8)&0xff;
-			*(dptr++) = (aorusbuffer[cvled]>>0)&0xff;
+			uint32_t rbuf = aorusbuffer[cvled];
+			*(dptr++) = (rbuf>>16)&0xff;
+			*(dptr++) = (rbuf>>8)&0xff;
+			*(dptr++) = (rbuf>>0)&0xff;
 			if( !all ) cvled++;
 			*(dptr++) = 0x00;
 			*(dptr++) = 0x00;
