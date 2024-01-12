@@ -25,6 +25,72 @@ menu_t * menu;
 menuLogbookRenderer_t* menuLogbookRenderer;
 font_t logbook;
 
+
+
+
+
+extern fnAdvancedUsbHandler advancedUsbHandler;
+int16_t sandboxAdvancedUSB(uint8_t* buffer, uint16_t length, uint8_t isGet);
+
+static char* local_hid_string_descriptor[5] = {
+    // array of pointer to string descriptors
+    (char[]){0x09, 0x04},   // 0: is supported language is English (0x0409)
+    "Magfest",              // 1: Manufacturer
+    "Swadge Controller",    // 2: Product
+    "WIFIBRIDGE",               // 3: Serials, should use chip ID
+    "Swadge HID interface", // 4: HID
+};
+
+
+// clang-format off
+#define TUD_HID_REPORT_DESC_NIL(...) \
+  HID_USAGE_PAGE ( HID_USAGE_PAGE_DESKTOP     )                 ,\
+  HID_USAGE      ( HID_USAGE_DESKTOP_GAMEPAD  )                 ,\
+  HID_COLLECTION ( HID_COLLECTION_APPLICATION )                 ,\
+    /* Allow for 0xaa (regular size), 0xab (jumbo sized) and 0xac mini feature reports; Windows needs specific id'd and size'd endpoints. */ \
+    HID_REPORT_COUNT ( CFG_TUD_ENDPOINT0_SIZE                 ) ,\
+    HID_REPORT_SIZE  ( 8                                      ) ,\
+    HID_REPORT_ID    ( 0xaa                                   ) \
+    HID_USAGE        ( HID_USAGE_DESKTOP_GAMEPAD              ) ,\
+    HID_FEATURE      ( HID_DATA | HID_ARRAY | HID_ABSOLUTE    ) ,\
+    HID_REPORT_COUNT ( (255-1)         ) ,\
+    HID_REPORT_ID    ( 0xab                                   ) \
+    HID_USAGE        ( HID_USAGE_DESKTOP_GAMEPAD              ) ,\
+    HID_FEATURE      ( HID_DATA | HID_ARRAY | HID_ABSOLUTE    ) ,\
+    HID_REPORT_COUNT ( 1                                      ) ,\
+    HID_REPORT_ID    ( 0xac                                   ) \
+    HID_USAGE        ( HID_USAGE_DESKTOP_GAMEPAD              ) ,\
+    HID_FEATURE      ( HID_DATA | HID_ARRAY | HID_ABSOLUTE    ) ,\
+    HID_REPORT_COUNT ( (255-1)         ) ,\
+    HID_REPORT_ID    ( 0xad                                   ) \
+    HID_USAGE        ( HID_USAGE_DESKTOP_GAMEPAD              ) ,\
+    HID_FEATURE      ( HID_DATA | HID_ARRAY | HID_ABSOLUTE    ) ,\
+  HID_COLLECTION_END
+// clang-format on
+
+static const uint8_t local_hid_report_descriptor[] = {TUD_HID_REPORT_DESC_NIL()};
+
+static const uint8_t local_hid_configuration_descriptor[] = {
+    TUD_CONFIG_DESCRIPTOR(1,                                                        // Configuration number
+                          1,                                                        // interface count
+                          0,                                                        // string index
+                          (TUD_CONFIG_DESC_LEN + (CFG_TUD_HID * TUD_HID_DESC_LEN)), // total length
+                          TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP,                       // attribute
+                          100),                                                     // power in mA
+
+    TUD_HID_DESCRIPTOR(0,                             // Interface number
+                       4,                             // string index
+                       false,                         // boot protocol
+                       sizeof(local_hid_report_descriptor), // report descriptor len
+                       0x81,                          // EP In address
+                       64,                            // size
+                       1),                           // polling interval
+};
+
+
+
+
+
 #define RFRXQUEUESIZE 16
 struct RFRXQueueElement
 {
@@ -97,6 +163,18 @@ void sandbox_main( void )
 
 	ESP_LOGI( ".", "Running from IRAM. %d\n", global_i );
 	esp_log_level_set( "*", ESP_LOG_VERBOSE ); // Enable logging if there's any way.
+
+	ESP_LOGI( "sandbox", "Running from IRAM. %d", global_i );
+
+	extern const tusb_desc_device_t descriptor_dev_kconfig;
+	void tinyusb_set_descriptor( const tusb_desc_device_t * dev_descriptor, const char **str_desc, int str_desc_count, const uint8_t *cfg_desc);
+	initTusb( (const tinyusb_config_t *)&descriptor_dev_kconfig, local_hid_report_descriptor );
+    tinyusb_set_descriptor(&descriptor_dev_kconfig, local_hid_string_descriptor, 5, local_hid_configuration_descriptor);
+	tud_disconnect();
+    tusb_init();
+	int i;	for( i = 0; i < 10000; i++ ) asm volatile( "nop" ); tud_connect();
+
+	advancedUsbHandler = sandboxAdvancedUSB;
 
     ESP_LOGI( "sandbox", "Running from IRAM. %d", global_i );
 
@@ -288,6 +366,7 @@ int16_t sandboxAdvancedUSB(uint8_t * buffer, uint16_t length, uint8_t isGet )
 
 		struct RFRXQueueElement * q = rqueue + rqueuetail;
 		int len = q->datasize;
+		ESP_LOGI( "+", "DS// %02x %02x %d\n", buffer[0], buffer[1], length );
 		memcpy( buffer, q->data, len );
 		
 		rqueuetail = (rqueuetail+1)&(RFRXQUEUESIZE-1);
@@ -297,6 +376,7 @@ int16_t sandboxAdvancedUSB(uint8_t * buffer, uint16_t length, uint8_t isGet )
 	{
 		if( espNowIsInit )
 		{
+			ESP_LOGI( "+", "SEND// %02x %02x %d\n", buffer[0], buffer[1], length );
 			espNowSend((char*)(buffer+2), buffer[1]);
 		}
 		return length;
@@ -310,7 +390,7 @@ swadgeMode_t sandbox_mode =
     .fnExitMode = sandbox_exit,
     .fnMainLoop = sandbox_tick,
     .fnBackgroundDrawCallback = sandboxBackgroundDrawCallback,
-	.overrideUsb = false,
+	.overrideUsb = true,
 	.fnAdvancedUSB = sandboxAdvancedUSB,
     .wifiMode = NO_WIFI,
     .fnAudioCallback = NULL,

@@ -62,7 +62,7 @@ hid_device * swadgehost_setup()
 {
 	hid_device * hd;
 	hid_init();
-	return hid_open( SWADGE_VID, SWADGE_PID, L"420690" );
+	return hid_open( SWADGE_VID, SWADGE_PID, L"WIFIBRIDGE" );
 }
 	
 #endif
