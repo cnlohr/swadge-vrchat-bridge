@@ -18,7 +18,7 @@ public class SwadgeIntegration : UdonSharpBehaviour
 	private const int playerArrayCount = 84;
 	
 	// We use a hard-coded 84 max, i.e. 80 + 4 staff.
-    private VRCPlayerApi[] playerArray = new VRCPlayerApi[playerArrayCount];
+	private VRCPlayerApi[] playerArray = new VRCPlayerApi[playerArrayCount];
 	private Vector4[] BoneData = new Vector4[84*12];
 
 	// 48 Entities (not counting VRChat players)
@@ -64,51 +64,51 @@ public class SwadgeIntegration : UdonSharpBehaviour
 		GunDirection[gun] = to;
 	}
 	
-    //Implemented
-    public void UUpdateEnemy(int enemyID, int enemyType, Vector3 Position, Quaternion Q) // Call this over and over
-    {
+	//Implemented
+	public void UUpdateEnemy(int enemyID, int enemyType, Vector3 Position, Quaternion Q) // Call this over and over
+	{
 		// TODO: cnlohr code goes here.
 		// THIS is called FROM Draken's code
 		EnemyPositions[enemyID] = new Vector4( Position.x, Position.y, Position.z, (float)enemyType );
 		EnemyRotations[enemyID] = new Vector4( Q.x, Q.y, Q.z, Q.w );
 		didUpdateEnemies = true;
-    }
+	}
 
-    //Implemented
-    public void URemoveEnemy(int enemyID) // Only call when you are done
-    {
+	//Implemented
+	public void URemoveEnemy(int enemyID) // Only call when you are done
+	{
 		// TODO: cnlohr code goes here.
 		// THIS is called FROM Draken's code
 		EnemyPositions[enemyID] = new Vector4( 0, 0, 0, -1 );
 		didUpdateEnemies = true;
-    }
+	}
 
-    //Implemented
-    public void UpdateBooletArrayFromSwadges(Vector3[] BooletPos, Vector3[] BooletTo, float[] BooletTimes, byte[] SwadgeID)
-    {
+	//Implemented
+	public void UpdateBooletArrayFromSwadges(Vector3[] BooletPos, Vector3[] BooletTo, float[] BooletTimes, byte[] SwadgeID)
+	{
 		// Call this from my stuff.
-        //dataManager._updateBooletArrayFromSwadges(BooletPos, BooletTo, SwadgeID);
-    }
+		//dataManager._updateBooletArrayFromSwadges(BooletPos, BooletTo, SwadgeID);
+	}
 
-    //Implemented
-    public void UpdateSwadgeShips(Vector3[] SwadgeShipPos, byte[] SwadgeID)
-    {
+	//Implemented
+	public void UpdateSwadgeShips(Vector3[] SwadgeShipPos, byte[] SwadgeID)
+	{
 		// Call this from my stuff.
-        // dataManager._updateSwadgeShips(SwadgeShipPos, SwadgeShipQuat, SwadgeID);
-    }
+		// dataManager._updateSwadgeShips(SwadgeShipPos, SwadgeShipQuat, SwadgeID);
+	}
 
-    //Implemented
-    public void SwadgeDefeated(byte SwadgeID)
-    {
+	//Implemented
+	public void SwadgeDefeated(byte SwadgeID)
+	{
 		// Call this from my stuff.
-        //dataManager._swadgeDefeated(SwadgeID);
-    }
+		//dataManager._swadgeDefeated(SwadgeID);
+	}
 
-    void Start()
-    {
+	void Start()
+	{
 		block = new MaterialPropertyBlock();
 		mr = GetComponent<SkinnedMeshRenderer>();
-    }
+	}
 
 	void Update()
 	{
@@ -117,8 +117,8 @@ public class SwadgeIntegration : UdonSharpBehaviour
 		for( int i = 0; i < playerArrayCount; i++ )
 		{
 			VRCPlayerApi p = playerArray[i];
-            if( Utilities.IsValid( p ) )
-            {
+			if( Utilities.IsValid( p ) )
+			{
 				int place = i*12;
 				Vector3 v = p.GetBonePosition(HumanBodyBones.Hips);
 				BoneData[place++] = (v.magnitude==0)?p.GetPosition():v;
@@ -133,7 +133,7 @@ public class SwadgeIntegration : UdonSharpBehaviour
 				BoneData[place++] = p.GetBonePosition(HumanBodyBones.LeftHand);
 				BoneData[place++] = p.GetBonePosition(HumanBodyBones.RightHand);
 				BoneData[place++] = p.GetVelocity();
-            }
+			}
 		}
 
 		block.SetVector( "GenProps", new Vector4( updateCount, Time.timeSinceLevelLoad, 0, 0 ) );
@@ -161,20 +161,20 @@ public class SwadgeIntegration : UdonSharpBehaviour
 		mr.SetPropertyBlock(block);
 		updateCount++;
 		
-        VRCAsyncGPUReadback.Request(H264FunIngress, 0, (IUdonEventReceiver)this);
+		VRCAsyncGPUReadback.Request(H264FunIngress, 0, (IUdonEventReceiver)this);
 	}
 	
 	
-    public override void OnAsyncGpuReadbackComplete(VRCAsyncGPUReadbackRequest request)
-    {
-        if (request.hasError)
-        {
-            Debug.LogError("GPU readback error!");
-            return;
-        }
-        else
-        {
-            var px = new Color32[H264FunIngress.width * H264FunIngress.height];
+	public override void OnAsyncGpuReadbackComplete(VRCAsyncGPUReadbackRequest request)
+	{
+		if (request.hasError)
+		{
+			Debug.LogError("GPU readback error!");
+			return;
+		}
+		else
+		{
+			var px = new Color32[H264FunIngress.width * H264FunIngress.height];
 			if( request.TryGetData(px) )
 			{
 				int i;
@@ -226,12 +226,12 @@ public class SwadgeIntegration : UdonSharpBehaviour
 			{
 				Debug.Log("GPU readback failure");
 			}
-        }
-    }
+		}
+	}
 
 	
 	
-    public override void OnPlayerJoined(VRC.SDKBase.VRCPlayerApi player)
+	public override void OnPlayerJoined(VRC.SDKBase.VRCPlayerApi player)
 	{
 		for( int i = 0; i < playerArrayCount; i++ )
 		{
@@ -241,9 +241,9 @@ public class SwadgeIntegration : UdonSharpBehaviour
 				break;
 			}
 		}
-    }
+	}
 
-    public override void OnPlayerLeft(VRC.SDKBase.VRCPlayerApi player)
+	public override void OnPlayerLeft(VRC.SDKBase.VRCPlayerApi player)
 	{
 		for( int i = 0; i < playerArrayCount; i++ )
 		{
@@ -259,5 +259,5 @@ public class SwadgeIntegration : UdonSharpBehaviour
 				break;
 			}
 		}
-    }
+	}
 }
