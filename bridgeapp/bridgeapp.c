@@ -421,7 +421,9 @@ void SendPacketToSwadge()
 	acbits += WriteUEQ( &assetCounts, 1 );
 	acbits += WriteUEQ( &assetCounts, sendmod ); //models
 	acbits += WriteUEQ( &assetCounts, sendshp ); // ships
-	acbits += WriteUEQ( &assetCounts, sendboo ); // boolets
+	acbits += WriteUEQ( &assetCounts, sendboo ); // boolet
+	acbits += WriteUEQ( &assetCounts, 0 ); // No cursed oopseys text
+	acbits += WriteUEQ( &assetCounts, 0 ); // No cursed regular text
 	acbits += WriteUQ( &assetCounts, 1, 1 );
 	FinalizeUEQ( &assetCounts, acbits );
 	*assetCountsPlace = assetCounts;
@@ -788,7 +790,6 @@ int main( int argc, char ** argv )
 						boolet_t * b = gOboolets + bid;
 
 						b->timeOfLaunch = (uint32_t)(OGGetAbsoluteTime() * 1000000) + 80000; //Add 80ms Offset.
-
 						b->launchLocation[0] = -dataf[y][0][0] * 64;
 						b->launchLocation[1] = dataf[y][0][1] * 64;
 						b->launchLocation[2] = dataf[y][0][2] * 64;
@@ -805,7 +806,10 @@ int main( int argc, char ** argv )
 						b->launchRotation[0] = tau * 3920 / 6.2831852;
 						b->launchRotation[1] = gam * 3920 / 6.2831852;
 						b->flags = id;
-						
+						if( b->launchRotation[0] < 0 ) b->launchRotation[0] += 3920;
+						if( b->launchRotation[1] < 0 ) b->launchRotation[1] += 3920;
+						//printf( "%d %d %d // %d %d\n", b->launchLocation[0], b->launchLocation[1], b->launchLocation[2], b->launchRotation[0], b->launchRotation[1], b->flags );
+
 						printf( "Launch Boolet! %f %f %f %f / %d %d %d / %d\n", dX, dY, dZ, mR, y, bid, id, b->timeOfLaunch );
 					}
 				}
