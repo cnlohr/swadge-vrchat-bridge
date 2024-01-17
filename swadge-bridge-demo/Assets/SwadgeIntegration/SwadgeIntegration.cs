@@ -84,14 +84,14 @@ public class SwadgeIntegration : UdonSharpBehaviour
     }
 
     //Implemented
-    public void UpdateBooletArrayFromSwadges(Vector3[] BooletPos, Vector3[] BooletTo, byte[] SwadgeID)
+    public void UpdateBooletArrayFromSwadges(Vector3[] BooletPos, Vector3[] BooletTo, float[] BooletTimes, byte[] SwadgeID)
     {
 		// Call this from my stuff.
         //dataManager._updateBooletArrayFromSwadges(BooletPos, BooletTo, SwadgeID);
     }
 
     //Implemented
-    public void UpdateSwadgeShips(Vector3[] SwadgeShipPos, Quaternion[] SwadgeShipQuat, byte[] SwadgeID)
+    public void UpdateSwadgeShips(Vector3[] SwadgeShipPos, byte[] SwadgeID)
     {
 		// Call this from my stuff.
         // dataManager._updateSwadgeShips(SwadgeShipPos, SwadgeShipQuat, SwadgeID);
@@ -181,8 +181,15 @@ public class SwadgeIntegration : UdonSharpBehaviour
 				int h = H264FunIngress.height;
 				int hindex = 6;
 				
-				byte[] SwadgeID = new Byte[90];
+				byte[] SwadgeID = new byte[90];
+				Vector3[] SwadgeShipPos = new Vector3[90];
+				
+				Vector3[] BooletPos = new Vector3[90*4];
+				Vector3[] BooletTo = new Vector3[90*4];
+				float [] BooletTime = new float[90*4];
+				byte[] BooletSwadgeID = new byte[90*4];
 
+				int bid = 0;
 				for( i = 0; i < 90; i++ )
 				{
 					int flags = (int)px[hindex+h*4].r;
@@ -195,20 +202,25 @@ public class SwadgeIntegration : UdonSharpBehaviour
 							SwadgeDefeated( (byte)i );
 						}
 					}
+					
+					Color32 Pos = px[hindex+h*1];
+					SwadgeShipPos[i] = new Vector3( Pos.r, Pos.g, Pos.b );
 					SwadgeID[i] = (byte)i;
+
+					Color32 BPos = px[hindex+h*12];
+					BooletPos[bid] = new Vector3( BPos.r, BPos.g, BPos.b );
+					Color32 BTo = px[hindex+h*16];
+					BooletTo[bid] = new Vector3( BTo.r, BTo.g, BTo.b );
+					Color32 BTime = px[hindex+h*8];
+					BooletTime[bid] = BTime.r;
+					BooletSwadgeID[bid] = (byte)i;
+					bid++;
+
+					hindex++;
 				}
 				
-					
-					    public void UpdateBooletArrayFromSwadges(Vector3[] BooletPos, Vector3[] BooletTo, byte[] SwadgeID)
-    {
-		// Call this from my stuff.
-        //dataManager._updateBooletArrayFromSwadges(BooletPos, BooletTo, SwadgeID);
-    }
-
-    //Implemented
-    public void UpdateSwadgeShips(Vector3[] SwadgeShipPos, Quaternion[] SwadgeShipQuat, byte[] SwadgeID)
-
-				}
+				UpdateBooletArrayFromSwadges( BooletPos, BooletTo, BooletTime, BooletSwadgeID );
+				UpdateSwadgeShips( SwadgeShipPos, SwadgeID );
 			}
 			else
 			{
