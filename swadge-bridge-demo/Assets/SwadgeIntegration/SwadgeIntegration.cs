@@ -90,7 +90,7 @@ public class SwadgeIntegration : UdonSharpBehaviour
 		//dataManager._updateBooletArrayFromSwadges(BooletPos, BooletTo, SwadgeID);
 		//Debug.Log(BooletPos[0] + " " + BooletTo[0] + " " + BooletTimes[0] );
 		//
-		//					Current Place = BooletPos + BooletTo * BooletTimes
+		//					Current Place = BooletPos + BooletTo * BooletTimes * 7.629
 	}
 
 	//Implemented
