@@ -293,5 +293,6 @@ int main()
 	tries = 0;
 
 	hid_close( hd );
+	return 0;
 }
 

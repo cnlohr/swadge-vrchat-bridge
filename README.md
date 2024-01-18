@@ -4,7 +4,6 @@
 
 ![System Overview](https://github.com/cnlohr/swadge-vrchat-bridge/blob/master/system_diagram.png?raw=true)
 
-
 # Editing
 
 
