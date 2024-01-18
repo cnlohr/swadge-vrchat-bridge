@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8510114792291904973}
   - component: {fileID: 4593702242038347541}
   - component: {fileID: 7107515113164675978}
+  - component: {fileID: 7893894010947232112}
   - component: {fileID: 9091048869826140739}
   m_Layer: 0
   m_Name: Playlist Entry
@@ -103,6 +104,35 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &7893894010947232112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3960744437511666802}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 540cc980d26b2764ea2169264bd140a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 0
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  _udonSharpBackingUdonBehaviour: {fileID: 9091048869826140739}
+  playlistUI: {fileID: 0}
+  track: 0
+  selectedText: {fileID: 3741026833195136738}
+  unselectedText: {fileID: 8103619927106050981}
+  urlText: {fileID: 0}
+  tracker: {fileID: 2256214947409746592}
+  trackerFill: {fileID: 2483975346091246337}
 --- !u!114 &9091048869826140739
 MonoBehaviour:
   m_ObjectHideFlags: 0

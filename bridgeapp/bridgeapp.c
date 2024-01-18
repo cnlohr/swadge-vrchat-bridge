@@ -858,6 +858,7 @@ int main( int argc, char ** argv )
 						BonePositions[playerid][fieldno][0] = dataf[y][field][0];
 						BonePositions[playerid][fieldno][1] = dataf[y][field][1];
 						BonePositions[playerid][fieldno][2] = dataf[y][field][2];
+						printf( "%f %f %f\n", BonePositions[playerid][fieldno][0], BonePositions[playerid][fieldno][1], BonePositions[playerid][fieldno][2] );
 					}
 				}
 
