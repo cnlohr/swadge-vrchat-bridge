@@ -53,7 +53,8 @@ Shader "Unlit/SwadgeAppDataExporter"
 			#include "Packages/com.llealloo.audiolink/Runtime/Shaders/AudioLink.cginc"
 
 			// 4, 4 component wide things.
-			#define EXPORTSIZE float2( 12, 608 )
+			#define EXPORTSIZE float2( 12, 608+48 )
+			#define MARGIN float2( 1, 1 )
 
 			struct appdata
 			{
@@ -83,6 +84,9 @@ Shader "Unlit/SwadgeAppDataExporter"
 			float3 BooletStartDirection[200];
 			float3 BooletStartDataTime[200]; // [in_use 0 or 1, a counter making a unique value starting at 0 and counting to 65535 and resetting to zero.]
 
+			float4 EnemyPositions[48];
+			float4 EnemyRotations[48];
+
 			float3 SkeletonData[12*84];
 			float3 GenProps;
 			
@@ -97,11 +101,11 @@ Shader "Unlit/SwadgeAppDataExporter"
 
 				if( _ProjectionParams.x < 0 )
 				{
-					o.vertex = float4( -1+(uvv)*EXPORTSIZE*2, 1, 1 );
+					o.vertex = float4( -1+(uvv)*(EXPORTSIZE)*2 + MARGIN*2/_ScreenParams.xy, 1, 1 );
 				}
 				else
 				{
-					float2 vo = -1+(uvv)*EXPORTSIZE*2;
+					float2 vo = -1+(uvv)*(EXPORTSIZE)*2 + MARGIN*2/_ScreenParams.xy;
 					vo.y = -vo.y;
 					o.vertex = float4( vo, 1, 1 );
 				}
@@ -115,7 +119,7 @@ Shader "Unlit/SwadgeAppDataExporter"
 			{
 //				if( _ProjectionParams.z != 0.313 ) discard;
 				
-				uint2 sp = i.vertex;
+				int2 sp = i.vertex;
 
 				if( _ProjectionParams.x < 0 )
 				{
@@ -125,6 +129,10 @@ Shader "Unlit/SwadgeAppDataExporter"
 				{
 					sp.y = sp.y;
 				}
+				
+				//return (sp.x+sp.y)&1;
+				
+				sp.xy -= MARGIN;
 
 				float3 testvar = 0;
 
@@ -234,6 +242,18 @@ Shader "Unlit/SwadgeAppDataExporter"
 							testvar = GunDirection[sp.y-584];
 						else
 							return float4( 0.0, 0.1, 0.0, 1.0 );
+					}
+					else if( sp.y < (608+48) )
+					{
+						//float4 EnemyPositions[48];
+						//float4 EnemyRotations[48];
+						int p = sp.y - 608;
+						switch( compcoord.x )
+						{
+							case 0: testvar = EnemyPositions[p].xyz; break;
+							case 1: testvar = EnemyRotations[p].xyz; break;
+							case 2: testvar = float3( EnemyPositions[p].w, EnemyRotations[p].w, 0.0 ); break;
+						}
 					}
 					else
 					{

@@ -18,7 +18,8 @@
 #include "swadgedmx.h"
 
 #define CAPWIDTH 64
-#define DATAHEIGHT 608
+#define MAX_BADDIES 48
+#define DATAHEIGHT (608+(MAX_BADDIES))
 
 #define AORUS_MOBO_LEDS_IMPLEMENTATION
 #include "aorus_mobo_leds.h"
@@ -27,6 +28,10 @@
 #include "../lib/swadgehost.h"
 
 #include "packagingfunctions.h"
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
 
 #define IS_MOBILE_CART 1
 
@@ -70,6 +75,11 @@ typedef struct
 
 og_mutex_t HidMutex;
 
+#define MAX_BADDIES 48
+float enemyPosAndProp[MAX_BADDIES][4];
+float enemyRotation[MAX_BADDIES][4];
+
+
 #define MAX_RTMP_PLAYERS 90
 multiplayerpeer_t gOplayers[(MAX_RTMP_PLAYERS)];
 boolet_t gOboolets[(MAX_RTMP_PLAYERS)*4+240];
@@ -107,7 +117,7 @@ network_model_t * modGuns[MAX_GUNS];
 int   LastSendPlayerPos;
 int   LastGunSendPos;
 int   LastBooletSendPos;
-
+int   LastEnemySendPos;
 
 int IsVec3Zero( float * vec )
 {
@@ -149,7 +159,9 @@ void SendPacketToSwadge()
 //float BonePositions[84][12][3];
 //int   LastSendPlayerPos;
 
-		if( !IsVec3Zero( BonePositions[LastSendPlayerPos][0] ) )
+		const int force_players_on = 0;
+		
+		if( force_players_on || !IsVec3Zero( BonePositions[LastSendPlayerPos][0] ) )
 		{
 			int hasSkeleton = 
 				!IsVec3Zero( BonePositions[LastSendPlayerPos][1] ) && 
@@ -176,7 +188,7 @@ void SendPacketToSwadge()
 				BoneData[place++] = p.GetBonePosition(HumanBodyBones.RightHand); //10
 				*/
 			sendmod++;
-
+			hasSkeleton |= force_players_on;
 			int nrbones = hasSkeleton?12:1;
 
 			// First is a codeword.  Contains ID, bones, bone mapping.
@@ -311,9 +323,9 @@ void SendPacketToSwadge()
 		}
 		LastSendPlayerPos++;
 		if(LastSendPlayerPos == MAX_VRC_PLAYERS ) LastSendPlayerPos = 0;
-		if( sendmod >= 3 ) break; // Set max # of players/models to send per frame.
+		if( sendmod >= 2 ) break; // Set max # of players/models to send per frame.
 	}
-
+	
 	for( i = 0; i < sizeof(modGuns) / sizeof(modGuns[0] ); i++ )
 	{
 		// Guns
@@ -333,13 +345,69 @@ void SendPacketToSwadge()
 
 		LastGunSendPos++;
 		if( LastGunSendPos == sizeof(modGuns) / sizeof(modGuns[0] ) ) LastGunSendPos = 0;
-		if( sendmod >= 4 ) break;
+		if( sendmod >= 3 ) break;
+	}
+
+	for( i = 0; i < MAX_BADDIES; i++ )
+	{
+		float * epos = enemyPosAndProp[LastEnemySendPos];
+		float * rot = enemyRotation[LastEnemySendPos];
+		int radius = 255;
+		int reqColor = 5*36;
+		int8_t velocity[3] = { 0, 0, 0 };
+		int16_t root[3] = { epos[0] * 64, epos[1] * 64, epos[2] * 64 };
+		
+		#define BNRBONES 3
+		static float vertices[BNRBONES*3] = {
+			-0.700000, -0.197415, -0.392405,
+			0.000000, -0.197415, 1.072363,
+			0.700000, -0.197415, -0.392405,
+			//-0.700000, -0.197415, -0.392405,
+			//0.000000, 0.462382, -0.054505,
+			//0.700000, -0.197415, -0.392405,
+		};
+		static int8_t bones[BNRBONES*3];
+		static int did_setup_bones;
+		if( !did_setup_bones )
+		{
+			int i;
+			for( i = 0; i < BNRBONES*3; i++ )
+			{
+				//XXX HACK: Just 1.5x arbitraraily scaled to make bigger.
+				bones[i] = vertices[i]*1.5*16;
+			}
+			did_setup_bones = 1;
+		}
+
+		uint32_t binencprop = 
+			(LastEnemySendPos + MAX_VRC_PLAYERS + MAX_GUNS) |
+			(( BNRBONES-1 )<<8);
+
+		binencprop |= 0b11<<12; // Who knows.  yolo.
+		
+		if( epos[3] >= 0 )
+		{
+			*((uint32_t*)pack) = binencprop; pack += 4;
+			memcpy( pack, root, sizeof( root ) ); pack += sizeof( root );
+			*(pack++) = radius;
+			*(pack++) = reqColor;
+			memcpy( pack, velocity, sizeof( velocity ) ); pack += sizeof( velocity );
+			memcpy( pack, bones, sizeof(bones) ); pack += sizeof(bones);
+			sendmod++;
+		}
+
+		LastEnemySendPos++;
+		if( LastEnemySendPos == MAX_BADDIES ) LastEnemySendPos = 0;
+		if( sendmod >= 5 ) break;
 	}
 
 	for( i = (MAX_RTMP_PLAYERS)*4; i < sizeof(gOboolets) / sizeof(gOboolets[0] ); i++ )
 	{
 		// Boolets
 		boolet_t * b = gOboolets + LastBooletSendPos;
+		if( pack-buff > 240 ) break; /// XXX SHIM: Disable boolets for now
+		int8_t zdir[3] = { 10, 0, 0 };
+
 		if( b->flags )
 		{
 			sendboo++;
@@ -349,12 +417,22 @@ void SendPacketToSwadge()
 			memcpy( pack, b->launchRotation, sizeof( b->launchRotation) ); pack += sizeof( b->launchRotation );
 			memcpy( pack, &b->flags, sizeof(b->flags) ); pack += sizeof( b->flags );
 		}
+		else
+		{
+			sendboo++;
+			*(pack++) = 0;//LastBooletSendPos-(MAX_RTMP_PLAYERS)*4; // Local "bulletID"
+			memset( pack, 0, sizeof( b->timeOfLaunch ) ); pack += sizeof( b->timeOfLaunch );
+			memset( pack, 0, sizeof( b->launchLocation) ); pack += sizeof( b->launchLocation );
+			memcpy( pack, zdir, sizeof( b->launchRotation) ); pack += sizeof( b->launchRotation );
+			memset( pack, 0, sizeof(b->flags) ); pack += sizeof( b->flags );
+		}
 		
 		LastBooletSendPos++;
 		if( LastBooletSendPos == sizeof(gOboolets) / sizeof(gOboolets[0] ) ) LastBooletSendPos = (MAX_RTMP_PLAYERS)*4;
 		if( sendboo >= 3 ) break;
 	}
-					
+	
+
 #if 0
 	// Now, need to send boolets.
 	for( i = 0; i < 5; i++ )
@@ -427,7 +505,6 @@ void SendPacketToSwadge()
 	acbits += WriteUQ( &assetCounts, 1, 1 );
 	FinalizeUEQ( &assetCounts, acbits );
 	*assetCountsPlace = assetCounts;
-
 
 	int len = pack - buff;
 	if( len < 254 )
@@ -607,7 +684,7 @@ int main( int argc, char ** argv )
 
 	OGCreateThread( RTMPTransmitThread, 0 );
 
-	CNFGSetup( argv[0], 480, 790);
+	CNFGSetup( argv[0], 480, 890);
 	SwadgeSetup();
 
 	float dataf[DATAHEIGHT][3][3];
@@ -675,6 +752,9 @@ int main( int argc, char ** argv )
 				goto final;
 			}
 			int i;
+
+			//stbi_write_png( "ttype.png", width, height, 4, bmpBuffer, width*4);
+
 			
 			int recheck = 0;
 			int ox, oy;
@@ -806,6 +886,7 @@ int main( int argc, char ** argv )
 						b->launchRotation[0] = tau * 3920 / 6.2831852;
 						b->launchRotation[1] = gam * 3920 / 6.2831852;
 						b->flags = id;
+
 						if( b->launchRotation[0] < 0 ) b->launchRotation[0] += 3920;
 						if( b->launchRotation[1] < 0 ) b->launchRotation[1] += 3920;
 						//printf( "%d %d %d // %d %d\n", b->launchLocation[0], b->launchLocation[1], b->launchLocation[2], b->launchRotation[0], b->launchRotation[1], b->flags );
@@ -870,8 +951,20 @@ int main( int argc, char ** argv )
 					g->velocity[1] = 0;
 					g->velocity[2] = 0;
 				}
-
 				
+				for( y = 608; y < 608+48; y++ )
+				{
+					int e = y - 608;
+					enemyPosAndProp[e][0] = dataf[y][0][0];
+					enemyPosAndProp[e][1] = dataf[y][0][1];
+					enemyPosAndProp[e][2] = dataf[y][0][2];
+					enemyPosAndProp[e][3] = dataf[y][2][0];
+					enemyRotation[e][0] = dataf[y][1][0];
+					enemyRotation[e][1] = dataf[y][1][1];
+					enemyRotation[e][2] = dataf[y][1][2];
+					enemyRotation[e][3] = dataf[y][2][1];
+				}
+		
 				OGUnlockMutex( mutSendDataBank );
 			}
 
@@ -953,7 +1046,7 @@ printf( "+WND: %d\n", wnd );
 				target = CreateCompatibleDC(screen);
 				printf( "WND: %d\nDC: %08x\nTARGET: %08x\n", wnd, screen, target );
 				width = CAPWIDTH;
-				height = DATAHEIGHT + 128;
+				height = DATAHEIGHT + 280;
 				bmp = CreateCompatibleBitmap(screen, width, height);
 			}
 		}
