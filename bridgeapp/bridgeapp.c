@@ -405,7 +405,7 @@ void SendPacketToSwadge()
 	{
 		// Boolets
 		boolet_t * b = gOboolets + LastBooletSendPos;
-		if( pack-buff > 200 ) break; /// XXX SHIM: Disable boolets for now
+		if( pack-buff > 240 ) break; /// XXX SHIM: Disable boolets for now
 		int8_t zdir[3] = { 10, 0, 0 };
 
 		if( b->flags )
@@ -432,8 +432,6 @@ void SendPacketToSwadge()
 		if( sendboo >= 3 ) break;
 	}
 	
-	
-	printf( "%d %d %d\n", pack - buff, LastEnemySendPos, sendboo );
 
 #if 0
 	// Now, need to send boolets.
