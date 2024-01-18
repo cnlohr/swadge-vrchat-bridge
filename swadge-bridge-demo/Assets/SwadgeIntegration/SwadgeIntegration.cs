@@ -157,6 +157,7 @@ public class SwadgeIntegration : UdonSharpBehaviour
 			block.SetVectorArray( "BooletStartDataTime", BooletStartDataTime );
 		}
 		
+		/*
 		// TEST TEST TEST ENEMY TEST
 		float f = Time.timeSinceLevelLoad;
 		for( int i = 0; i < 48; i++ )
@@ -166,6 +167,7 @@ public class SwadgeIntegration : UdonSharpBehaviour
 			UUpdateEnemy( i, 0, Pos, Q);
 			f += 0.01f;
 		}
+		*/
 
 		if( didUpdateEnemies )
 		{
