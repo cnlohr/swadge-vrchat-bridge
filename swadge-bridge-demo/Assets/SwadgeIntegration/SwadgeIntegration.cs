@@ -88,11 +88,20 @@ public class SwadgeIntegration : UdonSharpBehaviour
 	{
 		// Call this from my stuff.
 		//dataManager._updateBooletArrayFromSwadges(BooletPos, BooletTo, SwadgeID);
+		//Debug.Log(BooletPos[0] + " " + BooletTo[0] + " " + BooletTimes[0] );
+		//
+		//					Current Place = BooletPos + BooletTo * BooletTimes
 	}
 
 	//Implemented
 	public void UpdateSwadgeShips(Vector3[] SwadgeShipPos )
 	{
+		//int i;
+		//for( i = 0; i < 90; i++ )
+		//{
+		//	Debug.Log(SwadgeShipPos[i]);
+		//}
+		//Debug.Log("-------------------");
 		// Call this from my stuff.
 		// dataManager._updateSwadgeShips(SwadgeShipPos, SwadgeShipQuat, SwadgeID);
 	}
@@ -197,6 +206,7 @@ public class SwadgeIntegration : UdonSharpBehaviour
 			{
 				int i;
 				int h = H264FunIngress.height;
+				int w = H264FunIngress.width;
 				int hindex = 6;
 				
 				Vector3[] SwadgeShipPos = new Vector3[90];
@@ -204,7 +214,6 @@ public class SwadgeIntegration : UdonSharpBehaviour
 				Vector3[] BooletPos = new Vector3[90*4];
 				Vector3[] BooletTo = new Vector3[90*4];
 				float [] BooletTime = new float[90*4];
-				byte[] BooletSwadgeID = new byte[90*4];
 
 				int bid = 0;
 				for( i = 0; i < 90; i++ )
@@ -220,16 +229,36 @@ public class SwadgeIntegration : UdonSharpBehaviour
 						}
 					}
 					
-					Color32 Pos = px[hindex+h*1];
+					Color Pos = px[hindex+w*1];
 					SwadgeShipPos[i] = new Vector3( Pos.r, Pos.g, Pos.b );
 
-					Color32 BPos = px[hindex+h*12];
-					BooletPos[bid] = new Vector3( BPos.r, BPos.g, BPos.b );
-					Color32 BTo = px[hindex+h*16];
-					BooletTo[bid] = new Vector3( BTo.r, BTo.g, BTo.b );
-					Color32 BTime = px[hindex+h*8];
-					BooletTime[bid] = BTime.r;
-					bid++;
+					Color BPos = px[hindex+w*12];
+					BooletPos[bid+0] = new Vector3( BPos.r, BPos.g, BPos.b );
+					BPos = px[hindex+w*13];
+					BooletPos[bid+1] = new Vector3( BPos.r, BPos.g, BPos.b );
+					BPos = px[hindex+w*14];
+					BooletPos[bid+2] = new Vector3( BPos.r, BPos.g, BPos.b );
+					BPos = px[hindex+w*15];
+					BooletPos[bid+3] = new Vector3( BPos.r, BPos.g, BPos.b );
+
+					Color BTo = px[hindex+w*16];
+					BooletTo[bid+0] = new Vector3( BTo.r, BTo.g, BTo.b );
+					BTo = px[hindex+w*17];
+					BooletTo[bid+1] = new Vector3( BTo.r, BTo.g, BTo.b );
+					BTo = px[hindex+w*18];
+					BooletTo[bid+2] = new Vector3( BTo.r, BTo.g, BTo.b );
+					BTo = px[hindex+w*19];
+					BooletTo[bid+3] = new Vector3( BTo.r, BTo.g, BTo.b );
+					
+					Color BTime = px[hindex+w*8];
+					BooletTime[bid+0] = BTime.r;
+					BTime = px[hindex+w*9];
+					BooletTime[bid+1] = BTime.r;
+					BTime = px[hindex+w*10];
+					BooletTime[bid+2] = BTime.r;
+					BTime = px[hindex+w*11];
+					BooletTime[bid+3] = BTime.r;
+					bid+=4;
 
 					hindex++;
 				}
