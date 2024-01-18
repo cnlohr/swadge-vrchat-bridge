@@ -18,7 +18,7 @@
 #include "swadgedmx.h"
 
 #define CAPWIDTH 64
-#define DATAHEIGHT 608
+#define DATAHEIGHT (608+48)
 
 #define AORUS_MOBO_LEDS_IMPLEMENTATION
 #include "aorus_mobo_leds.h"
@@ -27,6 +27,10 @@
 #include "../lib/swadgehost.h"
 
 #include "packagingfunctions.h"
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
 
 #define IS_MOBILE_CART 1
 
@@ -69,6 +73,11 @@ typedef struct
 } network_model_t;
 
 og_mutex_t HidMutex;
+
+#define NUM_ENEMIES 48
+float enemyPosAndProp[NUM_ENEMIES][4];
+float enemyRotation[NUM_ENEMIES][4];
+
 
 #define MAX_RTMP_PLAYERS 90
 multiplayerpeer_t gOplayers[(MAX_RTMP_PLAYERS)];
@@ -354,7 +363,7 @@ void SendPacketToSwadge()
 		if( LastBooletSendPos == sizeof(gOboolets) / sizeof(gOboolets[0] ) ) LastBooletSendPos = (MAX_RTMP_PLAYERS)*4;
 		if( sendboo >= 3 ) break;
 	}
-					
+	printf( "%p %p %d\n" , pack, buff, pack - buff );
 #if 0
 	// Now, need to send boolets.
 	for( i = 0; i < 5; i++ )
@@ -605,7 +614,7 @@ int main( int argc, char ** argv )
 
 	OGCreateThread( RTMPTransmitThread, 0 );
 
-	CNFGSetup( argv[0], 480, 790);
+	CNFGSetup( argv[0], 480, 890);
 	SwadgeSetup();
 
 	float dataf[DATAHEIGHT][3][3];
@@ -673,6 +682,9 @@ int main( int argc, char ** argv )
 				goto final;
 			}
 			int i;
+
+			//stbi_write_png( "ttype.png", width, height, 4, bmpBuffer, width*4);
+
 			
 			int recheck = 0;
 			int ox, oy;
@@ -866,8 +878,20 @@ int main( int argc, char ** argv )
 					g->velocity[1] = 0;
 					g->velocity[2] = 0;
 				}
-
 				
+				for( y = 608; y < 608+48; y++ )
+				{
+					int e = y - 608;
+					enemyPosAndProp[e][0] = dataf[y][0][0];
+					enemyPosAndProp[e][1] = dataf[y][0][1];
+					enemyPosAndProp[e][2] = dataf[y][0][2];
+					enemyPosAndProp[e][3] = dataf[y][2][0];
+					enemyRotation[e][0] = dataf[y][1][0];
+					enemyRotation[e][1] = dataf[y][1][1];
+					enemyRotation[e][2] = dataf[y][1][2];
+					enemyRotation[e][3] = dataf[y][2][1];
+				}
+		
 				OGUnlockMutex( mutSendDataBank );
 			}
 
@@ -949,7 +973,7 @@ printf( "+WND: %d\n", wnd );
 				target = CreateCompatibleDC(screen);
 				printf( "WND: %d\nDC: %08x\nTARGET: %08x\n", wnd, screen, target );
 				width = CAPWIDTH;
-				height = DATAHEIGHT + 128;
+				height = DATAHEIGHT + 280;
 				bmp = CreateCompatibleBitmap(screen, width, height);
 			}
 		}

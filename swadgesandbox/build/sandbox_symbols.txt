@@ -20,16 +20,16 @@ SYMBOL TABLE:
 00000000 l    d  .xt.prop	00000000 .xt.prop
 00000000 l    df *ABS*	00000000 sandbox.c
 4005f120 l     F .inst	00000036 mainMenuCb
-00000000 l    df *ABS*	00000000 ccIL9B2k.o
+00000000 l    df *ABS*	00000000 ccjSqyyb.o
 4005f1d8 l       .inst	00000000 _advanced_usb_printf_head
 4005f1dc l       .inst	00000000 _GPIO_IN_REG
 4005f1f8 g       .inst	00000000 asm_read_gpio
 40035960 g       *ABS*	00000000 esp_log_write
-40088648 g       *ABS*	00000000 checkButtonQueueWrapper
-400a1098 g       *ABS*	00000000 loadFont
+40088644 g       *ABS*	00000000 checkButtonQueueWrapper
+400a1094 g       *ABS*	00000000 loadFont
 3fff03c4 g     O .bss	00000304 logbook
 3fff06cc g     O .bss	00000004 menu
-400bf394 g       *ABS*	00000000 espNowSend
+400bf3a8 g       *ABS*	00000000 espNowSend
 4001aba8 g       *ABS*	00000000 memcpy
 3ffef384 g     O .bss	00001040 rqueue
 3ffef214 g       .data	00000000 sandbox_sentinel_start_data
@@ -38,26 +38,26 @@ SYMBOL TABLE:
 3ffef378 g       .data	00000000 sandbox_sentinel_end_data
 3ffef340 g     O .data	0000002c sandbox_mode
 4005f211 g       .inst	00000000 sandbox_sentinel_end_inst
-400a2d28 g       *ABS*	00000000 initMenu
+400a2d24 g       *ABS*	00000000 initMenu
 4005f158 g     F .inst	0000005c sandboxAdvancedUSB
-400bef20 g       *ABS*	00000000 initEspNow
+400bef34 g       *ABS*	00000000 initEspNow
 3ffcc2f0 g       *ABS*	00000000 mainMenuMode
-400a3204 g       *ABS*	00000000 initMenuLogbookRenderer
+400a3200 g       *ABS*	00000000 initMenuLogbookRenderer
 3fff06c8 g     O .bss	00000004 menuLogbookRenderer
 40035a18 g       *ABS*	00000000 esp_log_timestamp
 4005f1f0 g       .inst	00000000 minimal_function
 4005f1e0 g       .inst	00000000 test_function
 4005ef60 g     F .inst	00000053 sandboxRxESPNow
-400a3308 g       *ABS*	00000000 drawMenuLogbook
-400a2d54 g       *ABS*	00000000 deinitMenu
+400a3304 g       *ABS*	00000000 drawMenuLogbook
+400a2d50 g       *ABS*	00000000 deinitMenu
 3ffef36c g     O .data	00000004 menu_Bootload
 4005efb4 g     F .inst	000000e2 sandbox_main
 3ffd16f8 g       *ABS*	00000000 advanced_usb_printf_head
 3fff06d0 g     O .bss	00000004 espNowIsInit
 4005f20c g     F .inst	00000005 sandboxBackgroundDrawCallback
-40088634 g       *ABS*	00000000 switchToSwadgeMode
+40088630 g       *ABS*	00000000 switchToSwadgeMode
 3ffef374 g     O .data	00000004 global_i
-400a2dbc g       *ABS*	00000000 addSingleItemToMenu
+400a2db8 g       *ABS*	00000000 addSingleItemToMenu
 4005f1b4 g     F .inst	00000024 dummy
 40010068 g       *ABS*	00000000 software_reset
 4005f098 g     F .inst	0000004a sandbox_exit
@@ -66,9 +66,9 @@ SYMBOL TABLE:
 3ffef380 g     O .bss	00000004 rqueuehead
 3ffef378 g     O .bss	00000004 stime
 3ffef37c g     O .bss	00000004 rqueuetail
-4011b198 g       *ABS*	00000000 esp_log_level_set
+4011b1ac g       *ABS*	00000000 esp_log_level_set
 4005f0e4 g     F .inst	00000039 sandbox_tick
 3ffeeeb8 g       .data	00000000 sandbox_sentinel_origin_data
-400a311c g       *ABS*	00000000 menuButton
+400a3118 g       *ABS*	00000000 menuButton
 
 
