@@ -53,7 +53,7 @@ Shader "Unlit/SwadgeAppDataExporter"
 			#include "Packages/com.llealloo.audiolink/Runtime/Shaders/AudioLink.cginc"
 
 			// 4, 4 component wide things.
-			#define EXPORTSIZE float2( 12, 608 )
+			#define EXPORTSIZE float2( 12, 608+48 )
 
 			struct appdata
 			{
@@ -82,6 +82,9 @@ Shader "Unlit/SwadgeAppDataExporter"
 			float3 BooletStartLocation[200];
 			float3 BooletStartDirection[200];
 			float3 BooletStartDataTime[200]; // [in_use 0 or 1, a counter making a unique value starting at 0 and counting to 65535 and resetting to zero.]
+
+			float4 EnemyPositions[48];
+			float4 EnemyRotations[48];
 
 			float3 SkeletonData[12*84];
 			float3 GenProps;
@@ -234,6 +237,18 @@ Shader "Unlit/SwadgeAppDataExporter"
 							testvar = GunDirection[sp.y-584];
 						else
 							return float4( 0.0, 0.1, 0.0, 1.0 );
+					}
+					else if( sp.y < (608+48) )
+					{
+						//float4 EnemyPositions[48];
+						//float4 EnemyRotations[48];
+						int p = sp.y - 608;
+						switch( compcoord.x )
+						{
+							case 0: testvar = EnemyPositions[p].xyz; break;
+							case 1: testvar = EnemyRotations[p].xyz; break;
+							case 2: testvar = float3( EnemyPositions[p].w, EnemyRotations[p].w, 0.0 ); break;
+						}
 					}
 					else
 					{

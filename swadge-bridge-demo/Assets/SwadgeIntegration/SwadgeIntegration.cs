@@ -108,6 +108,12 @@ public class SwadgeIntegration : UdonSharpBehaviour
 	{
 		block = new MaterialPropertyBlock();
 		mr = GetComponent<SkinnedMeshRenderer>();
+		
+		for (int i = 0; i < EnemyPositions.Length; i++)
+		{
+			EnemyPositions[i].w = -1;
+		}
+		didUpdateEnemies = true;
 	}
 
 	void Update()
@@ -150,6 +156,16 @@ public class SwadgeIntegration : UdonSharpBehaviour
 			block.SetVectorArray( "BooletStartDirection", BooletStartDirection );
 			block.SetVectorArray( "BooletStartDataTime", BooletStartDataTime );
 		}
+		
+		// TEST TEST TEST ENEMY TEST
+		float f = Time.timeSinceLevelLoad;
+		for( int i = 0; i < 48; i++ )
+		{
+			Vector3 Pos = new Vector3( (float)System.Math.Cos( f ), (float)System.Math.Sin( f ), 0 );
+			Quaternion Q = new Quaternion( 0, 0, 0, 1 );
+			UUpdateEnemy( i, 0, Pos, Q);
+			f += 0.7f;
+		}
 
 		if( didUpdateEnemies )
 		{
@@ -174,7 +190,7 @@ public class SwadgeIntegration : UdonSharpBehaviour
 		}
 		else
 		{
-			var px = new Color32[H264FunIngress.width * H264FunIngress.height];
+			var px = new Color[H264FunIngress.width * H264FunIngress.height];
 			if( request.TryGetData(px) )
 			{
 				int i;
