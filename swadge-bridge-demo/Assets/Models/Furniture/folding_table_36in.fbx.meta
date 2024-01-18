@@ -1,0 +1,200 @@
+fileFormatVersion: 2
+guid: 05fd276636cb11c438a651a71f7bc2a5
+ModelImporter:
+  serializedVersion: 22200
+  internalIDToNameTable:
+  - first:
+      1: 100000
+    second: //RootNode
+  - first:
+      1: 100002
+    second: FoldingTableLegs
+  - first:
+      1: 100004
+    second: FoldingTableLegsStub
+  - first:
+      1: 100006
+    second: FoldingTableTop
+  - first:
+      1: 100008
+    second: SimpleCloth
+  - first:
+      4: 400000
+    second: //RootNode
+  - first:
+      4: 400002
+    second: FoldingTableLegs
+  - first:
+      4: 400004
+    second: FoldingTableLegsStub
+  - first:
+      4: 400006
+    second: FoldingTableTop
+  - first:
+      4: 400008
+    second: SimpleCloth
+  - first:
+      21: 2100000
+    second: Plastic-White
+  - first:
+      21: 2100002
+    second: Metal-Black
+  - first:
+      21: 2100004
+    second: Table-DropCloth
+  - first:
+      23: 2300000
+    second: FoldingTableLegs
+  - first:
+      23: 2300002
+    second: FoldingTableLegsStub
+  - first:
+      23: 2300004
+    second: FoldingTableTop
+  - first:
+      23: 2300006
+    second: SimpleCloth
+  - first:
+      33: 3300000
+    second: FoldingTableLegs
+  - first:
+      33: 3300002
+    second: FoldingTableLegsStub
+  - first:
+      33: 3300004
+    second: FoldingTableTop
+  - first:
+      33: 3300006
+    second: SimpleCloth
+  - first:
+      43: 4300000
+    second: FoldingTableTop
+  - first:
+      43: 4300002
+    second: FoldingTableLegs
+  - first:
+      43: 4300004
+    second: SimpleCloth
+  - first:
+      43: 4300006
+    second: FoldingTableLegsStub
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Metal-Black
+    second: {fileID: 2100000, guid: ea7f42d808efd55488e6d47a6ceee959, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Plastic-White
+    second: {fileID: 2100000, guid: 90ca798c5620c6548be62ec4a3cc1f53, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Table-DropCloth
+    second: {fileID: 2100000, guid: a9cf1bcd2916ead4fb9e5a9a783d11f4, type: 2}
+  materials:
+    materialImportMode: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties:
+    - '#BAKERY{"meshName":["FoldingTableLegs","FoldingTableTop"],"padding":[256,153],"unwrapper":[0,0]}'
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 0
+    fileIdsGeneration: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 1
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 0
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 0
+  humanoidOversampling: 1
+  avatarSetup: 0
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 0
+  importBlendShapeDeformPercent: 0
+  remapMaterialsIfMaterialImportModeIsNone: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

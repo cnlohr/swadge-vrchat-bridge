@@ -1,0 +1,475 @@
+fileFormatVersion: 2
+guid: 39175920be459bb4ca7970ff19c489c1
+ModelImporter:
+  serializedVersion: 22200
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: AdvancedFloorInterlockingWhite
+    second: {fileID: 2100000, guid: 5fbd132d71b199244a49ec60500c7583, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: AdvancedFloorPanelsBlack
+    second: {fileID: 2100000, guid: 5b8f83a65b3dca242b225bd63d01f8e4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: AdvancedWallPanelsTechy
+    second: {fileID: 2100000, guid: 696e03e3f11c15f4f88f7e4764d54013, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: AncientBlockMasonryDark
+    second: {fileID: 2100000, guid: 897cebba70fb2c043982b2330b7742e0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Base-Glass
+    second: {fileID: 2100000, guid: 595352623f604424d9949f18af64c4d0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BrokenLimestoneBrickPath
+    second: {fileID: 2100000, guid: 16fa3c5cb551a884aad95f21bd52f5cc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: CleanSciFiMetalPanelB
+    second: {fileID: 2100000, guid: 4b70c8b5d212a344dba833d28652cf92, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: CyberWall
+    second: {fileID: 2100000, guid: 07478ede7b3fa3b4e910e9a547abc7ca, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: CyborgSphere
+    second: {fileID: 2100000, guid: 3c3acaacc4db32e4d82e54cff283bfd1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: DentedOldSteel
+    second: {fileID: 2100000, guid: 41d9774529a98fc45919f84a187480ea, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: DesertStrata03
+    second: {fileID: 2100000, guid: b9ec90e563a3b0c4881c53c70dd23792, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: DieselpunkTrimSheet
+    second: {fileID: 2100000, guid: eb0044bc599999641a1a63a730fa0ec9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: DoorPanels
+    second: {fileID: 2100000, guid: 9b7f35e523037414d94f5265a40b53b1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: FracturedCliff5
+    second: {fileID: 2100000, guid: 6a095b0656f05f54997a411851fca39c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: FracturedCliff8Grey
+    second: {fileID: 2100000, guid: 57bf4e9b62a32de4cad744c740c35418, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: FuturisticTechPanels
+    second: {fileID: 2100000, guid: 9a42fd08be0f958448ed0945e0957b4e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: FuturisticTechPanels.001
+    second: {fileID: 2100000, guid: 37ceff77624047742acb42060b91984a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Glow-Blue
+    second: {fileID: 2100000, guid: 4747e0db08658d24fb28ccc4b4728361, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Glow-Blue-Anim
+    second: {fileID: 2100000, guid: d8deab5a1a82f1a4cb94c829ad3f3c07, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Glow-Orange
+    second: {fileID: 2100000, guid: d0f36a241f90d8a48b6dfbdfdd8bf30c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: GlowTube
+    second: {fileID: 2100000, guid: e31d7ab7aea67f342bd774eb88379039, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: GrimeCoveredSteel
+    second: {fileID: 2100000, guid: 80cb0de0062ced44d98ba6347d3ca8a0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: LightBars
+    second: {fileID: 2100000, guid: 1521095011d8b2b4095f3258d237bfd8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MAGFestPrime-Cables-Segmented
+    second: {fileID: 2100000, guid: 38710fe72f73ccd4db77f4f71814bd3f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MAGFestPrime-Cables-Windowed
+    second: {fileID: 2100000, guid: 4eefff1c736522149933cd1d59fab908, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MFP-HotelRoomExt
+    second: {fileID: 2100000, guid: 3e948478e05e78f459375a9f2d7df734, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Metal-Black
+    second: {fileID: 2100000, guid: aef80ec7a49f718478f10f62520a9952, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Metal-Light
+    second: {fileID: 2100000, guid: 7ecc6aa4152c2d944b48db1c6d338fda, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Metal-Noise
+    second: {fileID: 2100000, guid: 6e2cad8ab2ac28c448d53f9b46672248, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MetalBlackDulled
+    second: {fileID: 2100000, guid: f6fa4359514474942ae685f7a527824d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MetalGroundPlating
+    second: {fileID: 2100000, guid: 965c937892cb6ca42af508dea9b84537, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MetalPipeWallRusty
+    second: {fileID: 2100000, guid: eb2d79a2fb322074f9d19195fa00d40b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MetalPlatedWalkway
+    second: {fileID: 2100000, guid: 60d9ac0d49c8016499a3315cc708d46a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MetalSciFiCurveWall
+    second: {fileID: 2100000, guid: 26170a65a858bb9479fc6d666b2b7b0a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MetalSciFiDoorPipes
+    second: {fileID: 2100000, guid: ab311aa3bd1fc114686c90535194030c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MetalSciFiPaneledRectangleWindow
+    second: {fileID: 2100000, guid: b981ce725ca1a2845b596a2f78848ac2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MetalSciFiTrimWallKit
+    second: {fileID: 2100000, guid: 4642e001152768f409d619da5782faed, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MetalSciFiVentPanelWithPipes
+    second: {fileID: 2100000, guid: eddaef79030ee7547a54b67ceb5b4201, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MetalScifiKit
+    second: {fileID: 2100000, guid: 0f3cde250d5b13c4f86dbd9647f1a52c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MetalSubwayTrimsheet
+    second: {fileID: 2100000, guid: bbe0747aef4d08744a8e5514a1a4bc6c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MetalWarehouseCeilingLights
+    second: {fileID: 2100000, guid: 5b732766cc8ecad4c98e844588fd0734, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MetalWarehouseCeilingLights.001
+    second: {fileID: 2100000, guid: 16c755fa97586224e9a3b6f0a9f45396, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MonitorsTransprent
+    second: {fileID: 2100000, guid: 88e6a10a35434444a929d2019891ac5a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MulchWoodlandBarkAndSticks
+    second: {fileID: 2100000, guid: 89d327e9830d0714c8daef0717f341a6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: ObservationGlass
+    second: {fileID: 2100000, guid: 1f9a258c24e52694a8967ef9cd4ed750, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: ObservationGlass-Dark
+    second: {fileID: 2100000, guid: 0e4fb4e8dd4e56c4884eb9fd1c6f24ec, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PaintedMetalCeiling
+    second: {fileID: 2100000, guid: 2fe212d59cbcdab40b9b22e6c07a12c7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PipeFloorBackground
+    second: {fileID: 2100000, guid: 60d268ac7f2048c45835adcdf627bcba, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PortalScreen-Lower
+    second: {fileID: 2100000, guid: 50454dc9e15896a48af93441b471187d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: RearWallGlassProjection
+    second: {fileID: 2100000, guid: 0a97baf826a2de54db6c041166b29db8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: RedRockSmoothWithCracks
+    second: {fileID: 2100000, guid: d4f177b311caf364d83b0f7f2f01d04d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: ReinforcedMetalGridWall
+    second: {fileID: 2100000, guid: 43c9a3aa6c1cadf498c63d906e86cdb1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: ReinforcedMetalGridWallClean
+    second: {fileID: 2100000, guid: 4123cbe546dec4348bf63dd94450d24d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: ReinforcedWallPanels
+    second: {fileID: 2100000, guid: 395b1350b27a4724190169764946f271, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: RustyBrushedSteelTiles
+    second: {fileID: 2100000, guid: af4a01233253bf44ab407d90e71b3d35, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: RustyMetalConstructionKit
+    second: {fileID: 2100000, guid: 5a34ab3e26073184e89df4ac82202ebc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Sci-FiPlasticHexagons
+    second: {fileID: 2100000, guid: d4aecaf95322a3a4e818265685c0e9a5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SciFiMetalFloorA
+    second: {fileID: 2100000, guid: 23a5da58494445a4196b4e168a5090df, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SciFiMetalFloorPlating
+    second: {fileID: 2100000, guid: 84c865a4eb18932438dce2e87af905cd, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SciFiMetalModuleWall
+    second: {fileID: 2100000, guid: 0226c244f03aadc449563dd59ea9f36b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SciFiMetalWithBars
+    second: {fileID: 2100000, guid: 3b73215a42c0c9047aef8c083c73766e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SciFiMetalWithTriangles
+    second: {fileID: 2100000, guid: fedd65a5b7ac6524ba4da27864c801a8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SciFiPaintedMechanicalTrimsheet
+    second: {fileID: 2100000, guid: eaddd5d3a44861d4c8f27b75571d3aba, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SciFiPanelsCeiling
+    second: {fileID: 2100000, guid: daa21d1e7aeef614b88898972422ebe3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SciFiPanelsStorageUnitsTrimsheet
+    second: {fileID: 2100000, guid: b416b49f44c4ac24e871eb1d49c5f700, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SciFiWallSet
+    second: {fileID: 2100000, guid: 6672f403d74a6994891edc1bf2d98ca7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SmoothTexasRock
+    second: {fileID: 2100000, guid: 2aa22b53bc74d6f46a1b9e8f73cf18c8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SpainishStoneBlockWall
+    second: {fileID: 2100000, guid: 473997c88cd35984689fe9bbceb0bb32, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: UnmortaredStoneWall
+    second: {fileID: 2100000, guid: 0d6a6c1d28fa27c4f90c06223eabd611, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: VineBark
+    second: {fileID: 2100000, guid: 14918ac83de02ee41965b30f53e50797, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: WarningPaintedMetalGridFloor
+    second: {fileID: 2100000, guid: df5f9bbec8a086f43bbfd053c5811cbc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: WeaponLockerSciFi
+    second: {fileID: 2100000, guid: 9dd707604ebedf3449bc4b09605325f5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: _COLLISION
+    second: {fileID: 2100000, guid: a61bbe828f9c84b4a85203f9cd36aaa7, type: 2}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties:
+    - '#BAKERY{"meshName":["Floor-DETAIL.004","Rubble-Stone-EHallDoor.036","Rubble-Stone-EHallDoor.005","SideBalcony.W.005","Rubble-Stone-EHallDoor.048","Floor-DETAIL.007","SideBalcony.W.002","LowAtriumFloor.Split.005","Door-GameArea-Mid","Wall.Upper.W.001","Plane.011","Rubble-Stone-EHallDoor.032","Cube.070","Details-Spawnpoint-Air-Forward-DoorUpper","Cube.073","FloorPlug.W","Cube.074","Circle.002","Elevators-N-1.001","Rubble-Stone-EHallDoor.020","Circle.019","Logo-Morphball-M.002","Wall-Side.E.002","PortalScreen-Lower.003","Elevators-N-1.027","Rubble-Stone-EHallDoor.044","Tree-Trunk-LowerWall","Rubble-Stone-EHallDoor.007","Rubble-Stone-EHallDoor","Base-Ramps-DETAIL.002","Details-SideRooms-Pipes.003","Wall.Upper.E","Rooms-Side-Forward.005","Floor-DETAIL.002","Wall-Rooms.015","Cube.075","GazeboFloor-MAG.002","StaffHallFloor.Split.006","Rubble-Stone-EHallDoor.025","SideBalcony.W.009","UpperPlatform.DETAIL.001","TELEPORTER","Wall-Rooms.008","MonsterSpawn.002","Details-Spawnpoint-Air-Sides.002","Base-OuterRing-DETAIL.002","Wall-Side.E.001","Rubble-Stone-EHallDoor.046","Base-Ramps-Rear.002","Rubble-Stone-EHallDoor.021","Cube.101","Circle.011","SideBalcony.E-DETAIL","SECRET.001","Details-SideRooms-Pipes.004","Cube.661_dmg.003","SideBalcony.W.014","Circle.021","Tree-Leaves-LowerWall","Wall-Side.E.003","ElevatorOuterWall-VGMTUpdate.001","FloorPlug.E","Platform-Low-Sides-Light","Ramp-UpperSide.E.002","Rubble-Stone-EHallDoor.012","Walls-Low","SideBalcony.W.015","Wall-Rooms.004","DoorFrame-Room-Upper.001","Base-OuterRing.002","ENEMYSPAWN","Room.Upper-DETAIL.003","Rubble-Stone-EHallDoor.009","Rubble-Stone-EHallDoor.033","Details-Spawnpoint-Air-Forward-DoorUpper.001","Circle.020","Columns-ExHallFoyer.001","Ramp-Upper.E-DETAIL","Cube.100","Back.Support1.002","Rubble-Stone-EHallDoor.011","Wall.Upper.W.002","Walls-Low.001","Room.Lower-DETAIL","SideBalcony.W.003","Upper-WallRear.W","Wall-Mid.001","Rubble-Stone-EHallDoor.034","Wall-Rooms.013","Plane.002","Wall-Rooms.012","AV-Portal-FloorRing-DETAIL","LowAtriumFloor.Split.004","Cube.102","SideBalcony.W.013","Cube","Wall-Rooms.014","Floor-DETAIL.005","Floor-DETAIL.001","Rubble-Stone-EHallDoor.024","Circle.023","Details-Spawnpoint-Air-Sides.001","Tree-Trunk-RoomsUpper","Rubble-Stone-EHallDoor.038","LowAtriumFloor.Split.002","FloorPlugs-Mid.001","Circle","Wall-RearCorners.001","Rubble-Stone-EHallDoor.027","Rubble-Stone-EHallDoor.002","Rubble-Stone-EHallDoor.008","Rubble-Stone-EHallDoor.028","Elevator-Rails-PipeJoint-T","Cube.099","CherryBlossomPreCeiling-DETAIL","StaffHallFloor.Split.004","Plane.013","Rubble-Stone-EHallDoor.042","Cube.112","Rubble-Stone-EHallDoor.050","Rooms-Side-Forward.004","Base-OuterRing-DETAIL.001","Cube.123","Back.Support1.003","SideBalcony.W.006","Cube.661_dmg.001","Rubble-Stone-EHallDoor.004","Rubble-Stone-EHallDoor.015","SideBalcony.W.004","Details-SideRooms-Pipes.002","ElevatorOuterWall-VGMTUpdate.002","Circle.040","Elevators-Inner-DETAIL.001","Circle.010","Ramp-Upper.E-DETAIL.002","Rubble-Stone-EHallDoor.016","Rubble-Stone-EHallDoor.041","Floor-DETAIL.008","Plane.012","Rubble-Stone-EHallDoor.019","Circle.030","Rubble-Stone-EHallDoor.017","Rubble-Stone-EHallDoor.049","Logo-Morphball-M.003","Base-InnerPit","Rubble-Stone-EHallDoor.026","Wall-Side.E.005","Elevators-N-1.017","Cylinder.014","CherryBlossomWalls.OuterCorner","Wall-Side.E.004","Cube.098","Rubble-Stone-EHallDoor.029","UpperPlatform.DETAIL.002","Ramp-Lower-E-DETAIL","Tree-Leaves-RoomsUpper","Rooms-Side-Forward.002","Base-Ramps-DETAIL","Window-RearWall-Center-Beams","Plane.014","Room.Upper-DETAIL.001","Floor-DETAIL","Cube.071","Window-RearWall-Center.017","HydraulicUnderRamp.Lower-DETAIL","FloorWindowsTrim-DETAIL.001","ElevatorOuterWall-VGMTUpdate.003","Rubble-Stone-EHallDoor.043","Wall-Rooms.009","Circle.009","Rubble-Stone-EHallDoor.010","Rail.004","Rail","Rail-Post.005","Rail-Post.001","GazeboFloor-MAG.001","Rubble-Stone-EHallDoor.023","DoorArch","Rooms-Side-Forward.003","Door-Low-Exterior.001","Rubble-Stone-EHallDoor.003","Circle.029","Plane.008","Details-SideRooms-Pipes","Cube.661_dmg.002","Wall-Rooms.007","Circle.032","Room.Upper-DETAIL","DoorFrame-Room-Upper","Rubble-Stone-EHallDoor.031","Platform-Low-Rear-Stairs-DETAIL","Rooms-Rear-SideFrame","Base-OuterRing-DETAIL","Window-RearWall-Center","Window-Mid.W","Walls-Back-Low.001","Walls-Back-Low","Wall.Lower.W.002","Wall.Lower.W.001","Wall.Lower.W","Wall-Side.E","Wall-Secret.E","Wall-RearCorners","Wall-Mid","UpperSideBalconies","SideBalcony.W","Rooms-Rear-Siderooms","Room-Interior-L","RearWall-Mid","RearWall","Ramp-UpperSide.E","Portal-ComputerTerminals-TEMP","Platform-Low-Rear-Overlook","LowAtriumFloor.Split.001","InteriorRoom-Mid","GazeboFloor-MAG.003","FloorPlugs-Mid","Exterior-Spaceport-UpperPlatform","Exterior-Spacedock-Stairs","Elevators-Plug","ElevatorOuterWall-VGMTUpdate.004","Door-Tunnel-Upper","Door-Tunnel-Mid","Door-Tunnel-Lower-Exterior","Door-Tunnel-Lower","Detail-Pipes-RoofRear","Detail-Fountain-Low-Pipe","ConnectorHall-Lower-MAG.002","CherryBlossom-DoorFrames","Base-Platform-Low","Detail-Fountain-Low-Water","Elevators-Inner-DETAIL","Rubble-Stone-EHallDoor.022","Rubble-Stone-EHallDoor.037","PortalScreen-Lower","FloorWindows-DETAIL.001","Rubble-Stone-EHallDoor.006","Exterior-Spacedock-Platform-DETAIL","Cylinder.013","Rubble-Stone-EHallDoor.047","Door-Low-Exterior","FloorWindows-DETAIL","Rubble-Stone-EHallDoor.039","Floor-DETAIL.006","Wall-Rooms.003","Tree-Trunk-Elevators","Logo-Morphball-M.001","Wall.Upper.W","Rubble-Stone-EHallDoor.013","Platform-Low-Sides-DETAIL","Base-Ramps-Rear-DETAIL","Back.Support1.005","Platform-Low-Rear-DETAIL","Tree-Leaves-Elevators","Wall-Lower-W-Tunnel","Plane.015","Base-Platform-Mid-DETAIL","Rubble-Stone-EHallDoor.040","FloorWindowsTrim-DETAIL","Rooms-Side-Forward","SideBalcony.W.011","SideBalcony.W.001","Circle.028","Rubble-Stone-EHallDoor.030","Circle.022","PortalScreen-Lower.001","Rubble-Stone-EHallDoor.018","Wall-Rooms.006","Rubble-Stone-EHallDoor.014","Wall-Rooms.001","Back.Support1.004","Back.Support1.001","Plane","Roof","Plane.010","Detail-Platform-Low-Rear","Rubble-Stone-EHallDoor.045","Rubble-Stone-EHallDoor.035","Wall-Rooms.010","Details-SideRooms-Pipes.001","Rubble-Stone-EHallDoor.001","UpperPlatform.DETAIL","GazeboTreeHoloPlanter.006","GazeboTreeHoloPlanter.002","Circle.042","BaseGlass","Base-Ramps-Rear-DETAIL.001","Base-Ramps-DETAIL.001","Base-Platform-Mid-DETAIL.001","Base-Platform-Low.001","InteriorRooms-Upper","Room-Armory","Circle.008"],"padding":[24,74,88,23,165,87,38,54,93,103,78,108,48,95,161,19,121,47,23,128,256,76,85,157,4,43,26,28,168,223,40,12,5,42,10,122,78,48,58,215,119,256,10,86,21,256,7,52,256,77,37,256,17,256,24,94,153,256,21,76,18,20,65,94,66,14,88,83,65,79,184,140,47,79,95,256,48,19,31,66,47,63,14,5,36,13,20,57,12,88,7,105,17,74,70,92,5,64,68,53,256,23,24,51,49,15,19,6,84,91,43,89,256,35,9,47,99,49,76,93,5,55,65,23,24,183,64,102,26,40,15,23,7,34,103,109,43,56,193,85,52,99,165,76,15,84,91,10,251,17,32,30,73,25,34,14,4,73,48,157,37,3,65,9,37,25,15,47,5,29,47,146,146,247,247,78,73,58,7,65,117,67,82,39,183,37,22,8,65,50,28,11,14,18,20,8,13,9,20,17,18,38,6,20,10,18,9,9,9,4,27,81,41,18,17,8,15,8,42,21,17,30,20,27,20,13,118,30,22,27,196,7,89,52,71,57,19,5,250,151,65,13,73,80,6,18,17,11,49,15,95,133,16,14,10,194,28,93,20,6,77,23,46,49,256,71,89,12,55,22,38,23,27,2,82,76,57,89,8,11,91,18,127,100,141,52,99,76,28,20,12,18,20],"unwrapper":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}'
+    clipAnimations: []
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 1
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 9
+    secondaryUVAreaDistortion: 15
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 2
+  humanoidOversampling: 1
+  avatarSetup: 0
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
