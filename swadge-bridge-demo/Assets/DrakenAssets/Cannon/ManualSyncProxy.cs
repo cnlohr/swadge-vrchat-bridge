@@ -1,8 +1,7 @@
 ﻿using UdonSharp;
 using UnityEngine;
-using VRC.Udon;
 
-namespace Bhenaniguns
+namespace DrakenStark
 {
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class ManualSyncProxy : UdonSharpBehaviour
