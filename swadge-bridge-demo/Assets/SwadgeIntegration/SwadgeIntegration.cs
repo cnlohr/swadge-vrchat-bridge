@@ -37,6 +37,8 @@ public class SwadgeIntegration : UdonSharpBehaviour
 
 	private Vector4[] GunLocation = new Vector4[24];
 	private Vector4[] GunDirection = new Vector4[24]; // [in_use 0 or 1, a counter making a unique value starting at 0 and counting to 65535 and resetting to zero.]
+	
+	[SerializeField] private DrakenStark.DataManager dataManager = null;
 
 	public void UpdateBoolet( int boolet, Vector3 pos, Vector3 to )
 	{
@@ -86,34 +88,37 @@ public class SwadgeIntegration : UdonSharpBehaviour
 	//Implemented
 	public void UpdateBooletArrayFromSwadges(Vector3[] BooletPos, Vector3[] BooletTo, float[] BooletTimes )
 	{
-		// Call this from my stuff.
-		//dataManager._updateBooletArrayFromSwadges(BooletPos, BooletTo, SwadgeID);
-		//Debug.Log(BooletPos[0] + " " + BooletTo[0] + " " + BooletTimes[0] );
-		//
-		//					Current Place = BooletPos + BooletTo * BooletTimes * 7.629
-	}
+        // Call this from my stuff.
+        //dataManager._updateBooletArrayFromSwadges(BooletPos, BooletTo, SwadgeID);
+        //Debug.Log(BooletPos[0] + " " + BooletTo[0] + " " + BooletTimes[0] );
+        //
+        //					Current Place = BooletPos + BooletTo * BooletTimes * 7.629
+        dataManager._updateBooletArrayFromSwadges(BooletPos, BooletTo, BooletTimes);
+    }
 
 	//Implemented
 	public void UpdateSwadgeShips(Vector3[] SwadgeShipPos )
 	{
-		//int i;
-		//for( i = 0; i < 90; i++ )
-		//{
-		//	Debug.Log(SwadgeShipPos[i]);
-		//}
-		//Debug.Log("-------------------");
-		// Call this from my stuff.
-		// dataManager._updateSwadgeShips(SwadgeShipPos, SwadgeShipQuat, SwadgeID);
-	}
+        //int i;
+        //for( i = 0; i < 90; i++ )
+        //{
+        //	Debug.Log(SwadgeShipPos[i]);
+        //}
+        //Debug.Log("-------------------");
+        // Call this from my stuff.
+        // dataManager._updateSwadgeShips(SwadgeShipPos, SwadgeShipQuat, SwadgeID);
+        dataManager._updateSwadgeShips(SwadgeShipPos);
+    }
 
 	//Implemented
-	public void SwadgeDefeated(byte SwadgeID)
+	public void SwadgeDefeated(byte Element)
 	{
-		// Call this from my stuff.
-		//dataManager._swadgeDefeated(SwadgeID);
-	}
+        // Call this from my stuff.
+        //dataManager._swadgeDefeated(SwadgeID);
+        dataManager._swadgeDefeated(Element);
+    }
 
-	void Start()
+    void Start()
 	{
 		block = new MaterialPropertyBlock();
 		mr = GetComponent<SkinnedMeshRenderer>();
