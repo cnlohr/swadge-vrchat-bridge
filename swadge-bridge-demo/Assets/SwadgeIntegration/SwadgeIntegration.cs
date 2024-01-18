@@ -161,10 +161,10 @@ public class SwadgeIntegration : UdonSharpBehaviour
 		float f = Time.timeSinceLevelLoad;
 		for( int i = 0; i < 48; i++ )
 		{
-			Vector3 Pos = new Vector3( (float)System.Math.Cos( f ), (float)System.Math.Sin( f ), 0 );
+			Vector3 Pos = new Vector3( (float)System.Math.Cos( f )*10.0f, 10.0f, (float)System.Math.Sin( f )*10.0f );
 			Quaternion Q = new Quaternion( 0, 0, 0, 1 );
 			UUpdateEnemy( i, 0, Pos, Q);
-			f += 0.7f;
+			f += 0.01f;
 		}
 
 		if( didUpdateEnemies )

@@ -54,6 +54,7 @@ Shader "Unlit/SwadgeAppDataExporter"
 
 			// 4, 4 component wide things.
 			#define EXPORTSIZE float2( 12, 608+48 )
+			#define MARGIN float2( 1, 1 )
 
 			struct appdata
 			{
@@ -100,11 +101,11 @@ Shader "Unlit/SwadgeAppDataExporter"
 
 				if( _ProjectionParams.x < 0 )
 				{
-					o.vertex = float4( -1+(uvv)*EXPORTSIZE*2, 1, 1 );
+					o.vertex = float4( -1+(uvv)*(EXPORTSIZE)*2 + MARGIN*2/_ScreenParams.xy, 1, 1 );
 				}
 				else
 				{
-					float2 vo = -1+(uvv)*EXPORTSIZE*2;
+					float2 vo = -1+(uvv)*(EXPORTSIZE)*2 + MARGIN*2/_ScreenParams.xy;
 					vo.y = -vo.y;
 					o.vertex = float4( vo, 1, 1 );
 				}
@@ -118,7 +119,7 @@ Shader "Unlit/SwadgeAppDataExporter"
 			{
 //				if( _ProjectionParams.z != 0.313 ) discard;
 				
-				uint2 sp = i.vertex;
+				int2 sp = i.vertex;
 
 				if( _ProjectionParams.x < 0 )
 				{
@@ -128,6 +129,10 @@ Shader "Unlit/SwadgeAppDataExporter"
 				{
 					sp.y = sp.y;
 				}
+				
+				//return (sp.x+sp.y)&1;
+				
+				sp.xy -= MARGIN;
 
 				float3 testvar = 0;
 

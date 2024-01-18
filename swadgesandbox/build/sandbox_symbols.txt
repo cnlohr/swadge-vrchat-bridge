@@ -24,7 +24,7 @@ SYMBOL TABLE:
 3ffef538 l     O .data	00000014 local_hid_string_descriptor
 4005f268 l     F .inst	00000036 mainMenuCb
 3ffef54c l     O .data	00000002 __compound_literal$0
-00000000 l    df *ABS*	00000000 ccCQpXFG.o
+00000000 l    df *ABS*	00000000 ccabURld.o
 4005f2c4 l       .inst	00000000 _advanced_usb_printf_head
 4005f2c8 l       .inst	00000000 _GPIO_IN_REG
 4005f2e4 g       .inst	00000000 asm_read_gpio
