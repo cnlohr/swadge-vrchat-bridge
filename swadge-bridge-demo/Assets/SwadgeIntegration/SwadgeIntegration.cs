@@ -84,14 +84,14 @@ public class SwadgeIntegration : UdonSharpBehaviour
 	}
 
 	//Implemented
-	public void UpdateBooletArrayFromSwadges(Vector3[] BooletPos, Vector3[] BooletTo, float[] BooletTimes, byte[] SwadgeID)
+	public void UpdateBooletArrayFromSwadges(Vector3[] BooletPos, Vector3[] BooletTo, float[] BooletTimes )
 	{
 		// Call this from my stuff.
 		//dataManager._updateBooletArrayFromSwadges(BooletPos, BooletTo, SwadgeID);
 	}
 
 	//Implemented
-	public void UpdateSwadgeShips(Vector3[] SwadgeShipPos, byte[] SwadgeID)
+	public void UpdateSwadgeShips(Vector3[] SwadgeShipPos )
 	{
 		// Call this from my stuff.
 		// dataManager._updateSwadgeShips(SwadgeShipPos, SwadgeShipQuat, SwadgeID);
@@ -199,7 +199,6 @@ public class SwadgeIntegration : UdonSharpBehaviour
 				int h = H264FunIngress.height;
 				int hindex = 6;
 				
-				byte[] SwadgeID = new byte[90];
 				Vector3[] SwadgeShipPos = new Vector3[90];
 				
 				Vector3[] BooletPos = new Vector3[90*4];
@@ -223,7 +222,6 @@ public class SwadgeIntegration : UdonSharpBehaviour
 					
 					Color32 Pos = px[hindex+h*1];
 					SwadgeShipPos[i] = new Vector3( Pos.r, Pos.g, Pos.b );
-					SwadgeID[i] = (byte)i;
 
 					Color32 BPos = px[hindex+h*12];
 					BooletPos[bid] = new Vector3( BPos.r, BPos.g, BPos.b );
@@ -231,14 +229,13 @@ public class SwadgeIntegration : UdonSharpBehaviour
 					BooletTo[bid] = new Vector3( BTo.r, BTo.g, BTo.b );
 					Color32 BTime = px[hindex+h*8];
 					BooletTime[bid] = BTime.r;
-					BooletSwadgeID[bid] = (byte)i;
 					bid++;
 
 					hindex++;
 				}
 				
-				UpdateBooletArrayFromSwadges( BooletPos, BooletTo, BooletTime, BooletSwadgeID );
-				UpdateSwadgeShips( SwadgeShipPos, SwadgeID );
+				UpdateBooletArrayFromSwadges( BooletPos, BooletTo, BooletTime );
+				UpdateSwadgeShips( SwadgeShipPos );
 			}
 			else
 			{
