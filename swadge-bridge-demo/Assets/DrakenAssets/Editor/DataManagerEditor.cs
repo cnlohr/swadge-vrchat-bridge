@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEditor;
 using UdonSharpEditor;
 using VRC;
-using VRC.PackageManagement.Core;
 
 namespace DrakenStark
 {
@@ -137,8 +136,9 @@ namespace DrakenStark
                         }
                         AllCannons[i].MarkDirty();
                     }
-                    AllCannonSync[0]._setupCannons(cannonTransforms);
+                    AllCannonSync[0]._setupCannons(AllCannons);
                     AllCannonSync[0].enabled = false;
+                    AllCannonSync[0].MarkDirty();
 
                     /*
                     Projectile[] AllProjectiles = FindObjectsOfType<Projectile>(true);

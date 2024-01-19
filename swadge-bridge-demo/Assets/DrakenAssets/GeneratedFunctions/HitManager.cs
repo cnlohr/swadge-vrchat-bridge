@@ -204,18 +204,5 @@ namespace DrakenStark
 		public void Swadge_113() { _enemyLogic._hit(113); }
 		public void Swadge_114() { _enemyLogic._hit(114); }
 		public void Swadge_115() { _enemyLogic._hit(115); }
-		public void Swadge_116() { _enemyLogic._hit(116); }
-		public void Swadge_117() { _enemyLogic._hit(117); }
-		public void Swadge_118() { _enemyLogic._hit(118); }
-		public void Swadge_119() { _enemyLogic._hit(119); }
-		public void Swadge_120() { _enemyLogic._hit(120); }
-		public void Swadge_121() { _enemyLogic._hit(121); }
-		public void Swadge_122() { _enemyLogic._hit(122); }
-		public void Swadge_123() { _enemyLogic._hit(123); }
-		public void Swadge_124() { _enemyLogic._hit(124); }
-		public void Swadge_125() { _enemyLogic._hit(125); }
-		public void Swadge_126() { _enemyLogic._hit(126); }
-		public void Swadge_127() { _enemyLogic._hit(127); }
-		public void Swadge_128() { _enemyLogic._hit(128); }
 	}
 }
