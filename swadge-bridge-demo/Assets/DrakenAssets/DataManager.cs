@@ -132,7 +132,7 @@ namespace DrakenStark
         {
             for (int i = 0; i < _swadgeProjectiles.Length; i++)
             {
-                _swadgeProjectiles[i].transform.SetPositionAndRotation(booletPos[i] + (booletTo[i] * _swadgeProjectSpeed * booletTimes[i]), Quaternion.Euler(booletTo[i]));
+                _swadgeProjectiles[i].transform.SetPositionAndRotation(booletPos[i] + (booletTo[i] * _swadgeProjectSpeed * booletTimes[i]), Quaternion.identity);
                 _swadgeProjectiles[i]._swadgeFiring();
             }
         }
