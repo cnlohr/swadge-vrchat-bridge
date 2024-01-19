@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: MyUdonBehaviourScript
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: ea033cf6859845448aec61d81927e069,
+  serializedUdonProgramAsset: {fileID: 11400000, guid: 0852f30e2e7750549b8ef71e05e99c76,
     type: 2}
   udonAssembly: 
   assemblyError: 

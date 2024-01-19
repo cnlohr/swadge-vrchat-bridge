@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: HandCannon
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 2f4aa142c7f43314a96196a4d39c528d,
+  serializedUdonProgramAsset: {fileID: 11400000, guid: 13b042a6a1071e940857e76dc8e8dd81,
     type: 2}
   udonAssembly: 
   assemblyError: 

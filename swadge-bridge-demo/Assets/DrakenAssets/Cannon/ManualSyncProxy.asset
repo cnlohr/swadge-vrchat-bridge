@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: ManualSyncProxy
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 74676cc67efad4b42a9e401d37e0c611,
+  serializedUdonProgramAsset: {fileID: 11400000, guid: 852cbfbbe59b1c44cb3b44d0aefd45a1,
     type: 2}
   udonAssembly: 
   assemblyError: 

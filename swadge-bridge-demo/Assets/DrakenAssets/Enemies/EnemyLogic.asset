@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: EnemyLogic
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 4d4f8e41c166c56498045e6eaf64b894,
+  serializedUdonProgramAsset: {fileID: 11400000, guid: 66e0fe89b9bb01540b30a72d48482d48,
     type: 2}
   udonAssembly: 
   assemblyError: 
