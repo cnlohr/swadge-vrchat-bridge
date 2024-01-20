@@ -8,9 +8,13 @@ namespace DrakenStark
         [SerializeField] private SwadgeIntegration _swadgeIntegration = null;
         [SerializeField] private Transform[] _cannons = null;
 
-        public void _setupCannons(Transform[] transforms)
+        public void _setupCannons(HandCannon[] cannons)
         {
-            _cannons = transforms;
+            _cannons = new Transform[cannons.Length];
+            for (int i = 0; i < cannons.Length; i++)
+            {
+                _cannons[i] = cannons[i].transform;
+            }
         }
         public void _setup(SwadgeIntegration swadgeIntegration)
         {

@@ -52,6 +52,14 @@ namespace DrakenStark
         // Only need to account for players that pickup cannons
         // Players = 0 to 83   (84)
 
+        private void Start()
+        {
+            if (_isSwadgeHost)
+            {
+                _toggleSwadgeHosting(true);
+            }
+        }
+
         public void _audioToggle(bool toggle)
         {
             _audioEnabled = toggle;

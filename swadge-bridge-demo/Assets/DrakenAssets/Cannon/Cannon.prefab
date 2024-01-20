@@ -17420,7 +17420,7 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 5844912547858170138}
   _dataManager: {fileID: 0}
-  _sourceOfShot: {fileID: 5844912547732006068}
+  _originID: 0
   _sourceCollider: {fileID: 8789461382739320412}
   _selfRigidBody: {fileID: 5844912547858170139}
   _selfAnimator: {fileID: 5844912547858170142}
@@ -17442,12 +17442,13 @@ MonoBehaviour:
   - {fileID: 3234128679810348005}
   - {fileID: 1055862395061660976}
   - {fileID: 1547189007666063863}
-  _hitLayer: 24
+  _enemyLayer: 0
   _velocity: {x: 762.9, y: 0, z: 0}
   _timeout: 15
-  _audioFired: {fileID: 5844912547858170143}
-  _audioHit: {fileID: 5844912548199829981}
-  _audioMissed: {fileID: 5844912548587567491}
+  _audioSource: {fileID: 0}
+  _audioClipFired: []
+  _audioClipHit: {fileID: 0}
+  _audioClipOther: {fileID: 0}
   _audioPitchMin: 0.8
   _audioPitchMax: 1.2
 --- !u!114 &5844912547858170138
@@ -18886,7 +18887,7 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 6691347575125840418}
   _dataManager: {fileID: 0}
-  _sourceOfShot: {fileID: 5844912547732006068}
+  _originID: 0
   _sourceCollider: {fileID: 8789461382739320412}
   _selfRigidBody: {fileID: 1667242083168962286}
   _selfAnimator: {fileID: 7364574917680806456}
@@ -18908,12 +18909,13 @@ MonoBehaviour:
   - {fileID: 4686972195674305816}
   - {fileID: 4203880891324985899}
   - {fileID: 8988660079038595244}
-  _hitLayer: 24
+  _enemyLayer: 0
   _velocity: {x: 762.9, y: 0, z: 0}
   _timeout: 15
-  _audioFired: {fileID: 6696516401360542314}
-  _audioHit: {fileID: 7936635431074299425}
-  _audioMissed: {fileID: 533825313704104825}
+  _audioSource: {fileID: 0}
+  _audioClipFired: []
+  _audioClipHit: {fileID: 0}
+  _audioClipOther: {fileID: 0}
   _audioPitchMin: 0.8
   _audioPitchMax: 1.2
 --- !u!114 &6691347575125840418
@@ -19643,17 +19645,18 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 5844912547732006069}
   _dataManager: {fileID: 0}
+  _respawnPoint: {fileID: 0}
+  _pickupCollider: {fileID: 0}
+  _enemySenseCollider: {fileID: 0}
+  _skinnedMeshRenderer: {fileID: 0}
+  _targetID: 0
   _fireOrigin: {fileID: 5844912549306974798}
   _cannonAnimator: {fileID: 5844912549080699980}
   _cannonPickup: {fileID: 5844912549080699988}
   _cannonObjectSync: {fileID: 5844912549080699989}
   _droppedTimeout: 10
+  _startingHitPoints: 10
   _chargingGO: {fileID: 5195664656754063323}
-  _chargedChamber: {fileID: 6307342183515049157}
-  _normalIdle: {fileID: 3376867219334278735}
-  _normalCharged: {fileID: 5482590954906434304}
-  _poweredIdle: {fileID: 2635723881585686713}
-  _poweredCharged: {fileID: 3506656035950061725}
   _projectiles:
   - {fileID: 5844912547858170133}
   - {fileID: 5751527371204412433}
@@ -19663,6 +19666,12 @@ MonoBehaviour:
   _coyoteFireWindow: 0.15
   _chargeShotTime: 1.5
   _shotVelocity: {x: 7, y: 0, z: 0}
+  _cannonAudioSource: {fileID: 0}
+  _charging: {fileID: 0}
+  _sustaining: {fileID: 0}
+  _healthAudioSource: {fileID: 0}
+  _ow: {fileID: 0}
+  _defeated: {fileID: 0}
 --- !u!114 &5844912547732006069
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19683,7 +19692,7 @@ MonoBehaviour:
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0
   _syncMethod: 3
-  serializedProgramAsset: {fileID: 11400000, guid: 2f4aa142c7f43314a96196a4d39c528d,
+  serializedProgramAsset: {fileID: 11400000, guid: 13b042a6a1071e940857e76dc8e8dd81,
     type: 2}
   programSource: {fileID: 11400000, guid: e41737567f6a0e247baa1752b2ba1d0e, type: 2}
   serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgEAAAAAAAAAAi8CAAAAAUkAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgBdAF0ALAAgAFYAUgBDAC4AVQBkAG8AbgAuAEMAbwBtAG0AbwBuAAIAAAAGAgAAAAAAAAAnAQQAAAB0AHkAcABlAAEXAAAAUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwAsACAAbQBzAGMAbwByAGwAaQBiACcBCgAAAFMAeQBtAGIAbwBsAE4AYQBtAGUAAR8AAABfAF8AXwBVAGQAbwBuAFMAaABhAHIAcABCAGUAaABhAHYAaQBvAHUAcgBWAGUAcgBzAGkAbwBuAF8AXwBfACcBBAAAAHQAeQBwAGUAARYAAABTAHkAcwB0AGUAbQAuAEkAbgB0ADMAMgAsACAAbQBzAGMAbwByAGwAaQBiABcBBQAAAFYAYQBsAHUAZQACAAAABwUHBQcF
@@ -24795,7 +24804,7 @@ MonoBehaviour:
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0
   _syncMethod: 1
-  serializedProgramAsset: {fileID: 11400000, guid: 74676cc67efad4b42a9e401d37e0c611,
+  serializedProgramAsset: {fileID: 11400000, guid: 852cbfbbe59b1c44cb3b44d0aefd45a1,
     type: 2}
   programSource: {fileID: 11400000, guid: 7da78eb10a8291f45aada0966238da31, type: 2}
   serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgEAAAAAAAAAAi8CAAAAAUkAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgBdAF0ALAAgAFYAUgBDAC4AVQBkAG8AbgAuAEMAbwBtAG0AbwBuAAIAAAAGAgAAAAAAAAAnAQQAAAB0AHkAcABlAAEXAAAAUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwAsACAAbQBzAGMAbwByAGwAaQBiACcBCgAAAFMAeQBtAGIAbwBsAE4AYQBtAGUAAR8AAABfAF8AXwBVAGQAbwBuAFMAaABhAHIAcABCAGUAaABhAHYAaQBvAHUAcgBWAGUAcgBzAGkAbwBuAF8AXwBfACcBBAAAAHQAeQBwAGUAARYAAABTAHkAcwB0AGUAbQAuAEkAbgB0ADMAMgAsACAAbQBzAGMAbwByAGwAaQBiABcBBQAAAFYAYQBsAHUAZQACAAAABwUHBQcF
@@ -25667,7 +25676,7 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 102695579734411199}
   _dataManager: {fileID: 0}
-  _sourceOfShot: {fileID: 5844912547732006068}
+  _originID: 0
   _sourceCollider: {fileID: 8789461382739320412}
   _selfRigidBody: {fileID: 1545893992858786585}
   _selfAnimator: {fileID: 504898374392386117}
@@ -25689,12 +25698,13 @@ MonoBehaviour:
   - {fileID: 7910981833322983841}
   - {fileID: 517127709422850109}
   - {fileID: 6813116591669365734}
-  _hitLayer: 24
+  _enemyLayer: 0
   _velocity: {x: 762.9, y: 0, z: 0}
   _timeout: 15
-  _audioFired: {fileID: 5216906407408630906}
-  _audioHit: {fileID: 8220957173247173083}
-  _audioMissed: {fileID: 7844654148500956666}
+  _audioSource: {fileID: 0}
+  _audioClipFired: []
+  _audioClipHit: {fileID: 0}
+  _audioClipOther: {fileID: 0}
   _audioPitchMin: 0.8
   _audioPitchMax: 1.2
 --- !u!114 &102695579734411199
@@ -27701,7 +27711,7 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 1523857252261009724}
   _dataManager: {fileID: 0}
-  _sourceOfShot: {fileID: 5844912547732006068}
+  _originID: 0
   _sourceCollider: {fileID: 8789461382739320412}
   _selfRigidBody: {fileID: 9186402806895885697}
   _selfAnimator: {fileID: 6886179856842711215}
@@ -27723,12 +27733,13 @@ MonoBehaviour:
   - {fileID: 6440186487480062516}
   - {fileID: 7167800115387966147}
   - {fileID: 8633138542357837436}
-  _hitLayer: 24
+  _enemyLayer: 0
   _velocity: {x: 762.9, y: 0, z: 0}
   _timeout: 15
-  _audioFired: {fileID: 8695480597645882665}
-  _audioHit: {fileID: 6045346672962238667}
-  _audioMissed: {fileID: 4010527184485912257}
+  _audioSource: {fileID: 0}
+  _audioClipFired: []
+  _audioClipHit: {fileID: 0}
+  _audioClipOther: {fileID: 0}
   _audioPitchMin: 0.8
   _audioPitchMax: 1.2
 --- !u!114 &1523857252261009724
