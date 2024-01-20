@@ -891,7 +891,7 @@ int main( int argc, char ** argv )
 						if( b->launchRotation[1] < 0 ) b->launchRotation[1] += 3920;
 						//printf( "%d %d %d // %d %d\n", b->launchLocation[0], b->launchLocation[1], b->launchLocation[2], b->launchRotation[0], b->launchRotation[1], b->flags );
 
-				printf( "+: %f %f %f\n", b->launchLocation[0], b->launchLocation[1], b->launchLocation[2] );
+				//printf( "+: %f %f %f\n", b->launchLocation[0], b->launchLocation[1], b->launchLocation[2] );
 					}
 				}
 				
@@ -965,7 +965,7 @@ int main( int argc, char ** argv )
 					enemyRotation[e][3] = dataf[y][2][1];
 				}
 
-				printf( "E: %f %f %f %f  %f %f %f %f\n", enemyPosAndProp[0][0], enemyPosAndProp[0][1], enemyPosAndProp[0][2], enemyPosAndProp[0][3], enemyRotation[1][0], enemyRotation[1][1], enemyRotation[1][2] );
+				//printf( "E: %f %f %f %f  %f %f %f %f\n", enemyPosAndProp[0][0], enemyPosAndProp[0][1], enemyPosAndProp[0][2], enemyPosAndProp[0][3], enemyRotation[1][0], enemyRotation[1][1], enemyRotation[1][2] );
 		
 				OGUnlockMutex( mutSendDataBank );
 			}
