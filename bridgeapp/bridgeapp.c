@@ -963,7 +963,7 @@ int main( int argc, char ** argv )
 					enemyRotation[e][3] = dataf[y][2][1];
 				}
 
-				printf( "E: %f %f %f %f\n", enemyPosAndProp[0][0], enemyPosAndProp[0][1], enemyPosAndProp[0][2], enemyPosAndProp[0][3] );
+				printf( "E: %f %f %f %f  %f %f %f %f\n", enemyPosAndProp[0][0], enemyPosAndProp[0][1], enemyPosAndProp[0][2], enemyPosAndProp[0][3], enemyRotation[1][0], enemyRotation[1][1], enemyRotation[1][2] );
 				printf( "E: %f %f %f\n", gOboolets[8].launchLocation[0], gOboolets[8].launchLocation[1], gOboolets[8].launchLocation[2] );
 		
 				OGUnlockMutex( mutSendDataBank );
