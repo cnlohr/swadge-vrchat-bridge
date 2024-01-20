@@ -890,8 +890,6 @@ int main( int argc, char ** argv )
 						if( b->launchRotation[0] < 0 ) b->launchRotation[0] += 3920;
 						if( b->launchRotation[1] < 0 ) b->launchRotation[1] += 3920;
 						//printf( "%d %d %d // %d %d\n", b->launchLocation[0], b->launchLocation[1], b->launchLocation[2], b->launchRotation[0], b->launchRotation[1], b->flags );
-
-						printf( "Launch Boolet! %f %f %f %f / %d %d %d / %d\n", dX, dY, dZ, mR, y, bid, id, b->timeOfLaunch );
 					}
 				}
 				
@@ -964,6 +962,9 @@ int main( int argc, char ** argv )
 					enemyRotation[e][2] = dataf[y][1][2];
 					enemyRotation[e][3] = dataf[y][2][1];
 				}
+
+				printf( "E: %f %f %f %f\n", enemyPosAndProp[0][0], enemyPosAndProp[0][1], enemyPosAndProp[0][2], enemyPosAndProp[0][3] );
+				printf( "E: %f %f %f\n", gOboolets[8].launchLocation[0], gOboolets[8].launchLocation[1], gOboolets[8].launchLocation[2] );
 		
 				OGUnlockMutex( mutSendDataBank );
 			}
